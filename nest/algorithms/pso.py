@@ -32,10 +32,7 @@ Particle = namedtuple('Particle',
                        'velocity', 'best_position'])
 
 
-class State(namedtuple('State', ['rng', 'params', 'swarm'])):
-
-    def __call__(self, key):
-        return self.params[key]
+State = namedtuple('State', ['rng', 'params', 'swarm'])
 
 
 def global_best(swarm):
@@ -64,7 +61,7 @@ def lbest(state, idx):
     :return: Particle: the locally best particle position.
     """
     swarm = state.swarm
-    n_s = state('n_s')
+    n_s = state.params['n_s']
     start = idx - (n_s // 2)
     best = None
     size = len(swarm)
@@ -75,11 +72,11 @@ def lbest(state, idx):
     return best.best_position
 
 
-def standard_position(position, velocity):
+def std_position(position, velocity):
     return position + velocity
 
 
-def standard_velocity(particle, social, state):
+def std_velocity(particle, social, state):
     """ Standard particle velocity update.
 
     Args:
@@ -89,11 +86,14 @@ def standard_velocity(particle, social, state):
 
     :return: numpy.ndarray: updated velocity of particle.
     """
-    inertia, c_1, c_2 = state('inertia'), state('c_1'), state('c_2')
+    w = state.params['inertia']
+    c_1, c_2 = state.params['c_1'], state.params['c_2']
     size = particle.position.size
+
     c_1r_1 = state.rng.uniform(0.0, c_1, size)
     c_2r_2 = state.rng.uniform(0.0, c_2, size)
-    return inertia * particle.velocity + \
+
+    return w * particle.velocity + \
            c_1r_1 * (particle.best_position - particle.position) + \
            c_2r_2 * (social - particle.position)
 
@@ -102,20 +102,22 @@ def clamp(velocity, v_max):
     return np.clip(velocity, -v_max, v_max)
 
 
-def standard_velocity_with_v_max(particle, social, state):
-    return clamp(standard_velocity(particle, social, state), state('v_max'))
+def std_velocity_with_v_max(particle, social, state):
+    return clamp(std_velocity(particle, social, state), state.params['v_max'])
 
 
 def update_particle(state, idx_particle):
     (idx, particle) = idx_particle
-    nbest = state('topology')(state, idx)
-    velocity = standard_velocity_with_v_max(particle, nbest, state)
-    position = standard_position(particle.position, velocity)
+
+    nbest = state.params['topology'](state, idx)
+
+    velocity = std_velocity_with_v_max(particle, nbest, state)
+    position = std_position(particle.position, velocity)
     return particle._replace(position=position, velocity=velocity)
 
 
-def update_fitness(fitness_f, particle):
-    fitness = fitness_f(particle.position)
+def update_fitness(problem, particle):
+    fitness = problem.fitness(particle.position)
     if particle.best_fitness is None or fitness < particle.best_fitness:
         best_position = particle.position
         return particle._replace(fitness=fitness,
@@ -138,11 +140,11 @@ def init_swarm(rng, size, domain):
     return [init_particle(rng, domain) for particle in range(size)]
 
 
-def pso(fitness, iterations, parameters=None):
+def pso(problem, iterations, parameters=None):
     """ Perform particle swarm optimization of the given fitness function.
 
     Args:
-        :param fitness: fitness function.
+        :param problem: optimization problem containing the fitness function.
         :param iterations: int: number of iterations to execute PSO for.
         :param parameters: dictionary: parameter dictionary for the PSO.
 
@@ -154,10 +156,10 @@ def pso(fitness, iterations, parameters=None):
     params = {**defaults, **({} if parameters is None else parameters)}
 
     rng = np.random.RandomState(params['seed'])
-    state = State(rng, params, init_swarm(rng, params['size'], fitness.domain))
+    state = State(rng, params, init_swarm(rng, params['size'], problem.domain))
 
     for iteration in range(iterations):
-        state = state._replace(swarm=[update_fitness(fitness, particle)
+        state = state._replace(swarm=[update_fitness(problem, particle)
                                       for particle in state.swarm])
         state = state._replace(swarm=[update_particle(state, ip)
                                       for ip in enumerate(state.swarm)])

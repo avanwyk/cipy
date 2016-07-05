@@ -17,4 +17,17 @@ problems.
 """
 from collections import namedtuple
 
+
+# Functions
+
+def minimize(left, right):
+    return left <= right
+
+
+def maximize(left, right):
+    return left > right
+
+
+# Data types
+
 Domain = namedtuple('Domain', ['lower', 'upper', 'dimension'])

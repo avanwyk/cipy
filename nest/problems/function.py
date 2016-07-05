@@ -19,14 +19,5 @@ problems.
 from collections import namedtuple
 
 
-def minimize(left, right):
-    return left < right
-
-
-class FunctionOptimization(namedtuple('FunctionBase',
-                                      ['type', 'function', 'domain'])):
-    def __call__(self, solution):
-        return self.function(solution)
-
-    def compare(self, left, right):
-        return self.type(left, right)
+FunctionOptimization = namedtuple('FunctionOptimization',
+                                  ['optimization', 'fitness', 'domain'])
