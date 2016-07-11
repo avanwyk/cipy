@@ -212,11 +212,11 @@ def init_swarm(rng, size, domain):
     return [init_particle(rng, domain) for particle in range(size)]
 
 
-def pso(problem, iterations, parameters=None):
+def pso(problem, stopping_condition, parameters=None):
     """ Perform particle swarm optimization of the given fitness function.
     Args:
         problem: optimization problem encapsulating the fitness function.
-        iterations: of iterations to execute PSO for.
+        stopping_condition: function specifying the stopping condition.
         parameters: dictionary: parameter dictionary for the PSO.
 
     Returns:
@@ -230,10 +230,12 @@ def pso(problem, iterations, parameters=None):
     rng = np.random.RandomState(params['seed'])
     state = State(rng, params, init_swarm(rng, params['size'], problem.domain))
 
-    for iteration in range(iterations):
+    iteration = 0
+    while not stopping_condition(iteration):
         state = state._replace(swarm=[update_fitness(problem, particle)
                                       for particle in state.swarm])
         state = state._replace(swarm=[update_particle(state, ip)
                                       for ip in enumerate(state.swarm)])
+        iteration += 1
 
     return global_best(state.swarm)
