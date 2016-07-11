@@ -224,7 +224,7 @@ def pso(problem, stopping_condition, parameters=None):
     """
     defaults = {'size': 25, 'n_s': 5, 'inertia': 0.729844,
                 'c_1': 1.496180, 'c_2': 1.496180, 'v_max': 0.5,
-                'topology': lbest, 'seed': None}
+                'topology': gbest, 'seed': None}
     params = {**defaults, **({} if parameters is None else parameters)}
 
     rng = np.random.RandomState(params['seed'])
