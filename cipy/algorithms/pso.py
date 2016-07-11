@@ -21,7 +21,7 @@ inertia term as per:
   IEEE World Congress on Computational Intelligence.,
   The 1998 IEEE International Conference on. IEEE, 1998.
 
-Function :func:`pso` defines the entry point for running the algorithm.
+Function 'pso' defines the entry point for running the algorithm.
 """
 from collections import namedtuple
 
@@ -36,6 +36,15 @@ State = namedtuple('State', ['rng', 'params', 'swarm'])
 
 
 def global_best(swarm):
+    """ Determines the global best particle in the swarm.
+
+    Args:
+        swarm: iterable: an iterable that yields all particles in the swarm.
+
+    Returns:
+        cipy.algorithms.pso.Particle: The best particle in the swarm when
+        comparing the best_fitness values of the particles.
+    """
     best = None
     for particle in swarm:
         if best is None or particle.best_fitness < best.best_fitness:
@@ -44,6 +53,16 @@ def global_best(swarm):
 
 
 def gbest(state, idx):
+    """ gbest Neighbourhood topology function.
+
+    Args:
+        state: cipy.algorithms.pso.State: The state of the PSO algorithm.
+        idx: int: index of particle in the swarm.
+
+    Returns:
+        cipy.algorithms.pso.Particle: The best particle in the swarm when
+        comparing the best_fitness values of the particles.
+    """
     best = state.swarm[idx]
     for particle in state.swarm:
         if particle.best_fitness < best.best_fitness:
@@ -52,13 +71,17 @@ def gbest(state, idx):
 
 
 def lbest(state, idx):
-    """ Lbest topology function.
+    """ lbest Neighbourhood topology function.
+
+    Neighbourhood size is determined by state.params['n_s'].
 
     Args:
-        :param state: State: PSO algorithm state.
-        :param idx: index of particle in neighbourhood.
+        state: cipy.algorithms.pso.State: The state of the PSO algorithm.
+        idx: int: index of particle in the swarm.
 
-    :return: Particle: the locally best particle position.
+    Returns:
+        cipy.algorithms.pso.Particle: The best particle local
+        (in the neighbourhood) to the indexed particle.
     """
     swarm = state.swarm
     n_s = state.params['n_s']
@@ -73,6 +96,15 @@ def lbest(state, idx):
 
 
 def std_position(position, velocity):
+    """ Standard particle position update.
+
+    Args:
+        position: numpy.ndarray: The current position.
+        velocity: numpy.ndarray: The particle velocity.
+
+    Returns:
+        numpy.ndarray: the calculated position.
+    """
     return position + velocity
 
 
@@ -80,22 +112,24 @@ def std_velocity(particle, social, state):
     """ Standard particle velocity update.
 
     Args:
-        :param particle: Particle: particle to update velocity for.
-        :param social: social best position of the particle.
-        :param state: PSO algorithm state.
+        particle: cipy.algorithms.pso.Particle: Particle to update the velocity
+            for.
+        social: cipy.algorithms.pso.Particle: The social best for the particle.
+        state: cipy.algorithms.pso.State: The state of the PSO algorithm.
 
-    :return: numpy.ndarray: updated velocity of particle.
+    Returns:
+        numpy.ndarray: the calculated velocity.
     """
-    w = state.params['inertia']
+    inertia = state.params['inertia']
     c_1, c_2 = state.params['c_1'], state.params['c_2']
     size = particle.position.size
 
     c_1r_1 = state.rng.uniform(0.0, c_1, size)
     c_2r_2 = state.rng.uniform(0.0, c_2, size)
 
-    return w * particle.velocity + \
-           c_1r_1 * (particle.best_position - particle.position) + \
-           c_2r_2 * (social - particle.position)
+    return (inertia * particle.velocity +
+            c_1r_1 * (particle.best_position - particle.position) +
+            c_2r_2 * (social - particle.position))
 
 
 def clamp(velocity, v_max):
@@ -107,6 +141,22 @@ def std_velocity_with_v_max(particle, social, state):
 
 
 def update_particle(state, idx_particle):
+    """ Update function for a particle.
+
+    Calculates and updates the velocity and position of a particle for a
+    single iteration of the PSO algorithm. Social best particle is determined by
+    the state.params['topology'] function.
+
+    Args:
+        state: cipy.algorithms.pso.State: The state of the PSO algorithm.
+        idx_particle: tuple: Tuple of the index of the particle and the
+            particle itself.
+
+    Returns:
+        cipy.algorithms.pso.Particle: A new particle with the updated position
+        and velocity.
+
+    """
     (idx, particle) = idx_particle
 
     nbest = state.params['topology'](state, idx)
@@ -117,6 +167,20 @@ def update_particle(state, idx_particle):
 
 
 def update_fitness(problem, particle):
+    """ Calculates and updates the fitness and best_fitness of a particle.
+
+    Fitness is calculated using the 'problem.fitness' function.
+
+    Args:
+        problem: The optimization problem encapsulating the fitness function and
+            optimization type.
+        particle: cipy.algorithms.pso.Particle: Particle to update the fitness
+            for.
+
+    Returns:
+        cipy.algorithms.pso.Particle: A new particle with the updated fitness.
+
+    """
     fitness = problem.fitness(particle.position)
     if particle.best_fitness is None or fitness < particle.best_fitness:
         best_position = particle.position
@@ -128,6 +192,14 @@ def update_fitness(problem, particle):
 
 
 def init_particle(rng, domain):
+    """ Initializes a particle within a domain.
+    Args:
+        rng: numpy.random.RandomState: The random number generator.
+        domain: cipy.problems.core.Domain: The domain of the problem.
+
+    Returns:
+        cipy.algorithms.pso.Particle: A new, fully initialized particle.
+    """
     position = rng.uniform(domain.lower, domain.upper, domain.dimension)
     return Particle(position=position,
                     velocity=np.zeros(domain.dimension),
@@ -142,13 +214,13 @@ def init_swarm(rng, size, domain):
 
 def pso(problem, iterations, parameters=None):
     """ Perform particle swarm optimization of the given fitness function.
-
     Args:
-        :param problem: optimization problem containing the fitness function.
-        :param iterations: int: number of iterations to execute PSO for.
-        :param parameters: dictionary: parameter dictionary for the PSO.
+        problem: optimization problem encapsulating the fitness function.
+        iterations: of iterations to execute PSO for.
+        parameters: dictionary: parameter dictionary for the PSO.
 
-    :return: Particle: the global best particle.
+    Returns:
+        cipy.algorithms.pso.Particle: The global best particle.
     """
     defaults = {'size': 25, 'n_s': 5, 'inertia': 0.729844,
                 'c_1': 1.496180, 'c_2': 1.496180, 'v_max': 0.5,

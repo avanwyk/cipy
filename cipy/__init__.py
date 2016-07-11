@@ -11,6 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+""" A collection of Computational Intelligence algorithms.
+"""
 __author__ = "avanwyk"
 __version__ = "0.1"
 __revision__ = "0.1.0.dev1"
