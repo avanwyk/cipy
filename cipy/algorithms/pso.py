@@ -28,8 +28,8 @@ from collections import namedtuple
 import numpy as np
 
 Particle = namedtuple('Particle',
-                      ['fitness', 'best_fitness', 'position',
-                       'velocity', 'best_position'])
+                      ['position', 'velocity', 'fitness',
+                       'best_fitness', 'best_position'])
 
 
 State = namedtuple('State', ['rng', 'params', 'swarm'])
