@@ -40,6 +40,8 @@ setup(name='cipy',
       install_requires=[
             'numpy',
       ],
+      setup_requires=['pytest-runner'],
+      tests_require=['pytest'],
       include_package_data=True,
       zip_safe=False)
 
