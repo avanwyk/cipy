@@ -1,3 +1,18 @@
+# Copyright 2016 Andrich van Wyk
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+""" Unit tests for the cipy.algorithms.pso module.
+"""
 import pytest
 import numpy as np
 
@@ -37,7 +52,7 @@ def test_gbest(rng, swarm_size, dimension):
     swarm = [mk_particle(best_fitness=rng.rand(),
                          best_position=rng.uniform(-5.12, 5.12, dimension))
              for i in range(swarm_size)]
-    state = pso.State(swarm=swarm, rng=rng, params={})
+    state = pso.State(swarm=swarm, rng=rng, params={}, iterations=0)
 
     desired = sorted(state.swarm, key=lambda p: p.best_fitness)[0].best_position
     actual = pso.gbest(state, 0)
