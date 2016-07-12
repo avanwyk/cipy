@@ -11,11 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" Module defining core utility types and functions used by algorithms.
+""" Unit tests for the cipy.algorithms.core module.
 """
+import pytest
+
+import cipy.algorithms.pso as pso
+import cipy.algorithms.core as core
 
 
-def max_iterations(maximum):
-    def max_iterations_(state):
-        return state.iterations >= maximum
-    return max_iterations_
+@pytest.mark.parametrize("iterations", [
+    0,
+    1,
+    10,
+    15
+])
+@pytest.mark.parametrize("max_iterations", [
+    0,
+    1,
+    10
+])
+def test_maximum_iterations(iterations, max_iterations):
+    stopping_condition = core.max_iterations(max_iterations)
+
+    state = pso.State(rng=None, params=None, swarm=None, iterations=iterations)
+    assert stopping_condition(state) == (iterations >= max_iterations)

@@ -32,7 +32,7 @@ Particle = namedtuple('Particle',
                        'best_fitness', 'best_position'])
 
 
-State = namedtuple('State', ['rng', 'params', 'swarm'])
+State = namedtuple('State', ['rng', 'params', 'swarm', 'iterations'])
 
 
 def global_best(swarm):
@@ -236,14 +236,14 @@ def pso(problem, stopping_condition, parameters=None):
 
     rng = np.random.RandomState(params['seed'])
     state = State(rng, params,
-                  init_swarm(rng, params['swarm_size'], problem.domain))
+                  init_swarm(rng, params['swarm_size'], problem.domain),
+                  iterations=0)
 
-    iteration = 0
-    while not stopping_condition(iteration):
+    while not stopping_condition(state):
         state = state._replace(swarm=[update_fitness(problem, particle)
                                       for particle in state.swarm])
         state = state._replace(swarm=[update_particle(state, ip)
-                                      for ip in enumerate(state.swarm)])
-        iteration += 1
+                                      for ip in enumerate(state.swarm)],
+                               iterations=state.iterations+1)
 
     return global_best(state.swarm)
