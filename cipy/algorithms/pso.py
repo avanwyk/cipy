@@ -133,7 +133,7 @@ def std_velocity(particle, social, state):
 
 
 def clamp(velocity, v_max):
-    return np.clip(velocity, -v_max, v_max)
+    return velocity if v_max is None else np.clip(velocity, -v_max, v_max)
 
 
 def std_velocity_with_v_max(particle, social, state):
@@ -212,6 +212,16 @@ def init_swarm(rng, size, domain):
     return [init_particle(rng, domain) for particle in range(size)]
 
 
+def default_parameters():
+    return {'swarm_size': 25, 'n_s': 5, 'inertia': 0.729844,
+            'c_1': 1.496180, 'c_2': 1.496180, 'v_max': None,
+            'topology': gbest, 'seed': None}
+
+
+def __init_parameters__(params):
+    return {**default_parameters(), **({} if params is None else params)}
+
+
 def pso(problem, stopping_condition, parameters=None):
     """ Perform particle swarm optimization of the given fitness function.
     Args:
@@ -222,13 +232,11 @@ def pso(problem, stopping_condition, parameters=None):
     Returns:
         cipy.algorithms.pso.Particle: The global best particle.
     """
-    defaults = {'size': 25, 'n_s': 5, 'inertia': 0.729844,
-                'c_1': 1.496180, 'c_2': 1.496180, 'v_max': 0.5,
-                'topology': gbest, 'seed': None}
-    params = {**defaults, **({} if parameters is None else parameters)}
+    params = __init_parameters__(parameters)
 
     rng = np.random.RandomState(params['seed'])
-    state = State(rng, params, init_swarm(rng, params['size'], problem.domain))
+    state = State(rng, params,
+                  init_swarm(rng, params['swarm_size'], problem.domain))
 
     iteration = 0
     while not stopping_condition(iteration):
