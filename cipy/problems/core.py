@@ -20,11 +20,11 @@ from collections import namedtuple
 
 # Functions
 
-def minimize(left, right):
+def minimal(left, right):
     return left <= right
 
 
-def maximize(left, right):
+def maximal(left, right):
     return left > right
 
 

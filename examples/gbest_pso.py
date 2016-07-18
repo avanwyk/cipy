@@ -15,10 +15,10 @@
 from cipy.algorithms.core import max_iterations
 from cipy.algorithms.pso import pso
 from cipy.benchmarks import functions
-from cipy.problems.core import Domain, minimize
+from cipy.problems.core import Domain, minimal
 from cipy.problems.function import FunctionOptimization
 
-optimization_problem = FunctionOptimization(optimization=minimize,
+optimization_problem = FunctionOptimization(optimal=minimal,
                                             fitness=functions.sphere,
                                             domain=Domain(-5.12, 5.12, 30))
 result = pso(problem=optimization_problem,
