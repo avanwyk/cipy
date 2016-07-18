@@ -8,7 +8,6 @@ Computational Intelligence algorithms in Python using NumPy.
     git clone https://github.com/avanwyk/cipy
     cd cipy
     pip install -e .
-    python examples/gbest_pso.py
     ```
 * Source (setup.py)
 
@@ -16,7 +15,6 @@ Computational Intelligence algorithms in Python using NumPy.
     git clone https://github.com/avanwyk/cipy
     cd cipy
     python setup.py install
-    python examples/gbest_pso.py
     ```
 * PyPI
 
@@ -24,5 +22,13 @@ Computational Intelligence algorithms in Python using NumPy.
     pip install cipy
     ``` 
 
+### Examples
+Examples of algorithms are given in the examples/ directory:
+
+```shell
+python examples/gbest_pso.py
+```
+
 ### License
-The project uses [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+The project uses
+[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
