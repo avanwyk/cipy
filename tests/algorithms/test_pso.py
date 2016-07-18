@@ -19,6 +19,7 @@ import numpy as np
 
 import cipy.algorithms.pso as pso
 
+from cipy.problems.core import minimal
 
 @pytest.fixture
 def rng():
@@ -35,7 +36,7 @@ def test_global_best(rng, swarm_size):
     swarm = [mk_particle(best_fitness=rng.rand()) for i in range(swarm_size)]
 
     desired = sorted(swarm, key=lambda p: p.best_fitness)[0]
-    actual = pso.global_best(swarm)
+    actual = pso.global_best(minimal, swarm)
 
     assert desired == actual
 
@@ -56,7 +57,7 @@ def test_gbest(rng, swarm_size, dimension):
     state = pso.State(swarm=swarm, rng=rng, params={}, iterations=0)
 
     desired = sorted(state.swarm, key=lambda p: p.best_fitness)[0].best_position
-    actual = pso.gbest(state, 0)
+    actual = pso.gbest(minimal, state, 0)
 
     np.testing.assert_allclose(actual, desired)
 

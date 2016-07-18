@@ -12,18 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+""" Example of gbest PSO algorithm
+"""
+
 from cipy.algorithms.core import max_iterations
 from cipy.algorithms.pso import pso
 from cipy.benchmarks import functions
 from cipy.problems.core import Domain, minimal
 from cipy.problems.function import FunctionOptimization
 
-optimization_problem = FunctionOptimization(optimal=minimal,
-                                            fitness=functions.sphere,
-                                            domain=Domain(-5.12, 5.12, 30))
-result = pso(problem=optimization_problem,
-             stopping_condition=max_iterations(1000),
-             parameters={'seed': 3758117674})
 
-print("Result fitness: %s" % result.fitness)
-print("Result: %s" % result.position)
+def main():
+    """ Main function to execute gbest PSO algorithm.
+    """
+    optimization_problem = FunctionOptimization(optimal=minimal,
+                                                fitness=functions.sphere,
+                                                domain=Domain(-5.12, 5.12, 30))
+    result = pso(problem=optimization_problem,
+                 stopping_condition=max_iterations(1000),
+                 parameters={'seed': 3758117674})
+
+    print("Result fitness: %s" % result.fitness)
+    print("Result: %s" % result.position)
+
+if __name__ == "__main__":
+    main()
