@@ -19,7 +19,11 @@ import numpy as np
 
 import cipy.algorithms.pso as pso
 
-from cipy.problems.core import minimal
+from cipy.algorithms.core import max_iterations
+from cipy.benchmarks import functions
+from cipy.problems.core import minimal, Domain
+from cipy.problems.function import FunctionOptimization
+
 
 @pytest.fixture
 def rng():
@@ -79,6 +83,25 @@ def test_standard_position(rng, dimension):
     actual = pso.std_position(position, velocity)
 
     np.testing.assert_allclose(actual, desired)
+
+
+@pytest.mark.parametrize("dimension", [
+    1,
+    30
+])
+def test_execution(dimension):
+    """ Smoke test for PSO algorithm testing complete execution of algorithm.
+    """
+    domain = Domain(-5.12, 5.12, dimension)
+    optimization_problem = FunctionOptimization(optimal=minimal,
+                                                fitness=functions.sphere,
+                                                domain=domain)
+    result = pso.pso(problem=optimization_problem,
+                     stopping_condition=max_iterations(2),
+                     parameters={'seed': 3758117674})
+
+    assert result.fitness != np.nan
+    assert result.position.size == dimension
 
 
 def mk_particle(position=None, velocity=None, fitness=None,
