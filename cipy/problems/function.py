@@ -20,4 +20,4 @@ from collections import namedtuple
 
 
 FunctionOptimization = namedtuple('FunctionOptimization',
-                                  ['optimal', 'fitness', 'domain'])
+                                  ['fitness', 'domain'])

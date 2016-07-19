@@ -16,18 +16,31 @@
 problems.
 """
 from collections import namedtuple
+from functools import singledispatch
 
-
-# Functions
-
-def minimal(left, right):
-    return left <= right
-
-
-def maximal(left, right):
-    return left > right
-
-
-# Data types
 
 Domain = namedtuple('Domain', ['lower', 'upper', 'dimension'])
+Minimum = namedtuple('Minimum', ['val'])
+Maximum = namedtuple('Maximum', ['val'])
+
+
+def minimize(fitness_function):
+    def objective_function(x):
+        return Minimum(fitness_function(x))
+    return objective_function
+
+
+def maximize(fitness_function):
+    def objective_function(x):
+        return Maximum(fitness_function(x))
+    return objective_function
+
+
+@singledispatch
+def compare(l, r):
+    return l.val <= r.val
+
+
+@compare.register(Maximum)
+def __compare_maximum__(l, r):
+    return l.val >= r.val

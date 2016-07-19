@@ -21,7 +21,7 @@ import cipy.algorithms.pso as pso
 
 from cipy.algorithms.core import max_iterations
 from cipy.benchmarks import functions
-from cipy.problems.core import minimal, Domain
+from cipy.problems.core import Domain, Minimum, minimize
 from cipy.problems.function import FunctionOptimization
 
 
@@ -37,10 +37,11 @@ def rng():
     100000,
 ])
 def test_global_best(rng, swarm_size):
-    swarm = [mk_particle(best_fitness=rng.rand()) for i in range(swarm_size)]
+    swarm = [mk_particle(best_fitness=Minimum(rng.rand()))
+             for i in range(swarm_size)]
 
     desired = sorted(swarm, key=lambda p: p.best_fitness)[0]
-    actual = pso.global_best(minimal, swarm)
+    actual = pso.global_best(swarm)
 
     assert desired == actual
 
@@ -55,13 +56,13 @@ def test_global_best(rng, swarm_size):
     30
 ])
 def test_gbest(rng, swarm_size, dimension):
-    swarm = [mk_particle(best_fitness=rng.rand(),
+    swarm = [mk_particle(best_fitness=Minimum(rng.rand()),
                          best_position=rng.uniform(-5.12, 5.12, dimension))
              for i in range(swarm_size)]
     state = pso.State(swarm=swarm, rng=rng, params={}, iterations=0)
 
     desired = sorted(state.swarm, key=lambda p: p.best_fitness)[0].best_position
-    actual = pso.gbest(minimal, state, 0)
+    actual = pso.gbest(state, 0)
 
     np.testing.assert_allclose(actual, desired)
 
@@ -93,8 +94,8 @@ def test_execution(dimension):
     """ Smoke test for PSO algorithm testing complete execution of algorithm.
     """
     domain = Domain(-5.12, 5.12, dimension)
-    optimization_problem = FunctionOptimization(optimal=minimal,
-                                                fitness=functions.sphere,
+    fitness = minimize(functions.sphere)
+    optimization_problem = FunctionOptimization(fitness=fitness,
                                                 domain=domain)
     result = pso.pso(problem=optimization_problem,
                      stopping_condition=max_iterations(2),

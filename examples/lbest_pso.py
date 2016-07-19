@@ -19,15 +19,15 @@ from cipy.algorithms.core import max_iterations
 from cipy.algorithms.pso import pso
 from cipy.algorithms.pso import lbest
 from cipy.benchmarks import functions
-from cipy.problems.core import Domain, minimal
+from cipy.problems.core import Domain, minimize
 from cipy.problems.function import FunctionOptimization
 
 
 def main():
     """ Main function to execute lbest PSO algorithm.
     """
-    optimization_problem = FunctionOptimization(optimal=minimal,
-                                                fitness=functions.sphere,
+    fitness_function = minimize(functions.sphere)
+    optimization_problem = FunctionOptimization(fitness_function,
                                                 domain=Domain(-5.12, 5.12, 30))
 
     result = pso(problem=optimization_problem,
