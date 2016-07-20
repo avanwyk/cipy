@@ -105,6 +105,20 @@ def test_execution(dimension):
     assert result.position.size == dimension
 
 
+@pytest.mark.parametrize("swarm_size", [
+    0,
+    1,
+    15,
+    100
+])
+def test_parameter_initialization(swarm_size):
+    params = pso.__init_parameters__({"swarm_size": swarm_size})
+    assert params["swarm_size"] == swarm_size
+
+    params = pso.__init_parameters__({})
+    assert params["swarm_size"] is not None
+
+
 def mk_particle(position=None, velocity=None, fitness=None,
                 best_fitness=None, best_position=None):
     return pso.Particle(position, velocity, fitness, best_fitness,
