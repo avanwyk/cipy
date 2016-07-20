@@ -1,6 +1,7 @@
 # CIPy
 
 [![Build Status](https://travis-ci.org/avanwyk/cipy.svg?branch=master)](https://travis-ci.org/avanwyk/cipy)
+[![license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://github.com/avanwyk/cipy/blob/master/LICENSE)
 
 Computational Intelligence algorithms in Python using NumPy.
 
