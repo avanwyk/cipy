@@ -16,8 +16,6 @@
 problems.
 """
 from collections import namedtuple
-from functools import singledispatch
-
 
 Domain = namedtuple('Domain', ['lower', 'upper', 'dimension'])
 Minimum = namedtuple('Minimum', ['val'])
@@ -36,11 +34,8 @@ def maximize(fitness_function):
     return objective_function
 
 
-@singledispatch
-def compare(l, r):
-    return l.val <= r.val
-
-
-@compare.register(Maximum)
-def __compare_maximum__(l, r):
-    return l.val >= r.val
+def comparator(p):
+    if isinstance(p, Minimum):
+        return lambda l, r: l < r
+    else:
+        return lambda l, r: l > r

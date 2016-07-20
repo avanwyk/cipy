@@ -26,8 +26,7 @@ Function 'pso' defines the entry point for running the algorithm.
 from collections import namedtuple
 
 import numpy as np
-
-from cipy.problems.core import compare
+from cipy.problems.core import comparator
 
 Particle = namedtuple('Particle',
                       ['position', 'velocity', 'fitness',
@@ -47,9 +46,10 @@ def global_best(swarm):
         cipy.algorithms.pso.Particle: The best particle in the swarm when
         comparing the best_fitness values of the particles.
     """
-    best = None
+    best = swarm[0]
+    cmp = comparator(best.best_fitness)
     for particle in swarm:
-        if best is None or compare(particle.best_fitness, best.best_fitness):
+        if cmp(particle.best_fitness, best.best_fitness):
             best = particle
     return best
 
@@ -65,11 +65,7 @@ def gbest(state, idx):
         cipy.algorithms.pso.Particle: The best particle in the swarm when
         comparing the best_fitness values of the particles.
     """
-    best = state.swarm[idx]
-    for particle in state.swarm:
-        if compare(particle.best_fitness, best.best_fitness):
-            best = particle
-    return best.best_position
+    return global_best(state.swarm).best_position
 
 
 def lbest(state, idx):
@@ -87,12 +83,13 @@ def lbest(state, idx):
     """
     swarm = state.swarm
     n_s = state.params['n_s']
-    start = idx - (n_s // 2)
-    best = None
+    start = idx - (n_s // 2) + 1
+    best = swarm[start - 1]
     size = len(swarm)
+    cmp = comparator(best.best_fitness)
     for k in range(n_s):
         particle = swarm[(start + k) % size]
-        if best is None or compare(particle.best_fitness, best.best_fitness):
+        if cmp(particle.best_fitness, best.best_fitness):
             best = particle
     return best.best_position
 
@@ -185,7 +182,8 @@ def update_fitness(problem, particle):
     """
     fitness = problem.fitness(particle.position)
     best_fitness = particle.best_fitness
-    if best_fitness is None or compare(fitness, best_fitness):
+    cmp = comparator(fitness)
+    if best_fitness is None or cmp(fitness, best_fitness):
         best_position = particle.position
         return particle._replace(fitness=fitness,
                                  best_fitness=fitness,
