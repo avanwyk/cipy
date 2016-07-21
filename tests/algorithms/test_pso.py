@@ -59,12 +59,11 @@ def test_gbest(rng, swarm_size, dimension):
     swarm = [mk_particle(best_fitness=Minimum(rng.rand()),
                          best_position=rng.uniform(-5.12, 5.12, dimension))
              for i in range(swarm_size)]
-    state = pso.State(swarm=swarm, rng=rng, params={}, iterations=0)
 
-    desired = sorted(state.swarm, key=lambda p: p.best_fitness)[0].best_position
-    actual = pso.gbest(state, 0)
+    desired = sorted(enumerate(swarm), key=lambda ip: ip[1].best_fitness)[0][0]
+    actual = pso.gbest_idx(swarm)
 
-    np.testing.assert_allclose(actual, desired)
+    assert actual == desired
 
 
 @pytest.mark.parametrize("dimension", [
