@@ -64,8 +64,7 @@ def gbest_idx(swarm):
     """
     best = 0
     cmp = comparator(swarm[best].best_fitness)
-    for ip in enumerate(swarm):
-        (idx, particle) = ip
+    for (idx, particle) in enumerate(swarm):
         if cmp(particle.best_fitness, swarm[best].best_fitness):
             best = idx
     return best
