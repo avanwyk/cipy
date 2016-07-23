@@ -143,8 +143,8 @@ def update_particle(state, idx_particle):
     """ Update function for a particle.
 
     Calculates and updates the velocity and position of a particle for a
-    single iteration of the PSO algorithm. Social best particle is determined by
-    the state.params['topology'] function.
+    single iteration of the PSO algorithm. Social best particle is determined
+    by the state.params['topology'] function.
 
     Args:
         state: cipy.algorithms.pso.State: The state of the PSO algorithm.
@@ -171,8 +171,8 @@ def update_fitness(problem, particle):
     Fitness is calculated using the 'problem.fitness' function.
 
     Args:
-        problem: The optimization problem encapsulating the fitness function and
-            optimization type.
+        problem: The optimization problem encapsulating the fitness function
+            and optimization type.
         particle: cipy.algorithms.pso.Particle: Particle to update the fitness
             for.
 
