@@ -46,7 +46,7 @@ def optimize(problem, stopping_condition, parameters=None,
 
     rng = np.random.RandomState(params['seed'])
 
-    initial_swarm = [init_particle(rng, problem.domain)
+    initial_swarm = [functions.init_particle(rng, problem.domain)
                      for i in range(params['swarm_size'])]
     state = types.State(rng, params, initial_swarm, iterations=0)
 
@@ -69,23 +69,6 @@ def optimize(problem, stopping_condition, parameters=None,
         state = parameter_update(state, problem)
 
     return functions.solution(state.swarm)
-
-
-def init_particle(rng, domain):
-    """ Initializes a particle within a domain.
-    Args:
-        rng: numpy.random.RandomState: The random number generator.
-        domain: cipy.problems.core.Domain: The domain of the problem.
-
-    Returns:
-        cipy.algorithms.pso.Particle: A new, fully initialized particle.
-    """
-    position = rng.uniform(domain.lower, domain.upper, domain.dimension)
-    return types.Particle(position=position,
-                          velocity=np.zeros(domain.dimension),
-                          fitness=None,
-                          best_fitness=None,
-                          best_position=position)
 
 
 def default_parameters():

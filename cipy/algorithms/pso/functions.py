@@ -94,12 +94,6 @@ def std_parameter_update(state, problem):
     return state
 
 
-def default_parameters():
-    return {'swarm_size': 25, 'n_s': 5, 'inertia': 0.729844,
-            'c_1': 1.496180, 'c_2': 1.496180, 'v_max': None,
-            'topology': gbest_topology, 'seed': None}
-
-
 def init_particle(rng, domain):
     """ Initializes a particle within a domain.
     Args:
@@ -279,7 +273,3 @@ def solution(swarm):
 
 def __topology__(swarm, social_best):
     return dict([(idx, social_best(idx)) for idx in range(len(swarm))])
-
-
-def __init_parameters__(params):
-    return {**default_parameters(), **({} if params is None else params)}
