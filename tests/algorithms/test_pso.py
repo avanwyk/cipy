@@ -36,12 +36,12 @@ def rng():
     25,
     100000,
 ])
-def test_global_best(rng, swarm_size):
+def test_solution(rng, swarm_size):
     swarm = [mk_particle(best_fitness=Minimum(rng.rand()))
              for i in range(swarm_size)]
 
     desired = sorted(swarm, key=lambda p: p.best_fitness)[0]
-    actual = pso.global_best(swarm)
+    actual = pso.__solution__(swarm)
 
     assert desired == actual
 

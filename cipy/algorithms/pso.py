@@ -35,22 +35,120 @@ Particle = namedtuple('Particle',
 State = namedtuple('State', ['rng', 'params', 'swarm', 'iterations'])
 
 
-def global_best(swarm):
-    """ Determines the global best particle in the swarm.
+def default_parameters():
+    return {'swarm_size': 25, 'n_s': 5, 'inertia': 0.729844,
+            'c_1': 1.496180, 'c_2': 1.496180, 'v_max': None,
+            'topology': gbest_topology, 'seed': None}
 
+
+def pso(problem, stopping_condition, parameters=None):
+    """ Perform particle swarm optimization of the given fitness function.
     Args:
-        swarm: iterable: an iterable that yields all particles in the swarm.
+        problem: optimization problem encapsulating the fitness function.
+        stopping_condition: function specifying the stopping condition.
+        parameters: dictionary: parameter dictionary for the PSO.
 
     Returns:
-        cipy.algorithms.pso.Particle: The best particle in the swarm when
-        comparing the best_fitness values of the particles.
+        cipy.algorithms.pso.Particle: The global best particle.
     """
-    best = swarm[0]
-    cmp = comparator(best.best_fitness)
-    for particle in swarm:
-        if cmp(particle.best_fitness, best.best_fitness):
-            best = particle
-    return best
+    params = __init_parameters__(parameters)
+
+    rng = np.random.RandomState(params['seed'])
+
+    initial_swarm = [init_particle(rng, problem.domain)
+                     for i in range(params['swarm_size'])]
+    state = State(rng, params, initial_swarm, iterations=0)
+
+    topology_function = state.params['topology']
+
+    while not stopping_condition(state):
+        state = state._replace(swarm=[update_fitness(problem, particle)
+                                      for particle in state.swarm])
+
+        n_bests = topology_function(state)
+
+        state = state._replace(swarm=[update_particle(state, n_bests, ip)
+                                      for ip in enumerate(state.swarm)],
+                               iterations=state.iterations + 1)
+
+    return __solution__(state.swarm)
+
+
+def init_particle(rng, domain):
+    """ Initializes a particle within a domain.
+    Args:
+        rng: numpy.random.RandomState: The random number generator.
+        domain: cipy.problems.core.Domain: The domain of the problem.
+
+    Returns:
+        cipy.algorithms.pso.Particle: A new, fully initialized particle.
+    """
+    position = rng.uniform(domain.lower, domain.upper, domain.dimension)
+    return Particle(position=position,
+                    velocity=np.zeros(domain.dimension),
+                    fitness=None,
+                    best_fitness=None,
+                    best_position=position)
+
+
+def update_fitness(problem, particle):
+    """ Calculates and updates the fitness and best_fitness of a particle.
+
+    Fitness is calculated using the 'problem.fitness' function.
+
+    Args:
+        problem: The optimization problem encapsulating the fitness function
+            and optimization type.
+        particle: cipy.algorithms.pso.Particle: Particle to update the fitness
+            for.
+
+    Returns:
+        cipy.algorithms.pso.Particle: A new particle with the updated fitness.
+
+    """
+    fitness = problem.fitness(particle.position)
+    best_fitness = particle.best_fitness
+    cmp = comparator(fitness)
+    if best_fitness is None or cmp(fitness, best_fitness):
+        best_position = particle.position
+        return particle._replace(fitness=fitness,
+                                 best_fitness=fitness,
+                                 best_position=best_position)
+    else:
+        return particle._replace(fitness=fitness)
+
+
+def update_particle(state, nbest_topology, idx_particle):
+    """ Update function for a particle.
+
+    Calculates and updates the velocity and position of a particle for a
+    single iteration of the PSO algorithm. Social best particle is determined
+    by the state.params['topology'] function.
+
+    Args:
+        state: cipy.algorithms.pso.State: The state of the PSO algorithm.
+        nbest_topology: dict: Containing neighbourhood best index for each
+            particle index.
+        idx_particle: tuple: Tuple of the index of the particle and the
+            particle itself.
+
+    Returns:
+        cipy.algorithms.pso.Particle: A new particle with the updated position
+        and velocity.
+
+    """
+    (idx, particle) = idx_particle
+
+    nbest = state.swarm[nbest_topology[idx]].best_position
+
+    velocity = std_velocity_with_v_max(particle, nbest, state)
+    position = std_position(particle.position, velocity)
+    return particle._replace(position=position, velocity=velocity)
+
+
+def gbest_topology(state):
+    gbest = gbest_idx(state.swarm)
+    return __topology__(state.swarm, lambda i: gbest)
 
 
 def gbest_idx(swarm):
@@ -68,6 +166,10 @@ def gbest_idx(swarm):
         if cmp(particle.best_fitness, swarm[best].best_fitness):
             best = idx
     return best
+
+
+def lbest_topology(state):
+    return __topology__(state.swarm, lambda i: lbest_idx(state, i))
 
 
 def lbest_idx(state, idx):
@@ -94,19 +196,6 @@ def lbest_idx(state, idx):
         if cmp(particle.best_fitness, swarm[best].best_fitness):
             best = idx
     return best
-
-
-def gbest_topology(state):
-    gbest = gbest_idx(state.swarm)
-    return topology(state.swarm, lambda i: gbest)
-
-
-def lbest_topology(state):
-    return topology(state.swarm, lambda i: lbest_idx(state, i))
-
-
-def topology(swarm, social_best):
-    return dict([(idx, social_best(idx)) for idx in range(len(swarm))])
 
 
 def std_position(position, velocity):
@@ -146,125 +235,35 @@ def std_velocity(particle, social, state):
             c_2r_2 * (social - particle.position))
 
 
-def clamp(velocity, v_max):
-    return velocity if v_max is None else np.clip(velocity, -v_max, v_max)
-
-
 def std_velocity_with_v_max(particle, social, state):
     return clamp(std_velocity(particle, social, state), state.params['v_max'])
 
 
-def update_particle(state, nbest_topology, idx_particle):
-    """ Update function for a particle.
-
-    Calculates and updates the velocity and position of a particle for a
-    single iteration of the PSO algorithm. Social best particle is determined
-    by the state.params['topology'] function.
-
-    Args:
-        state: cipy.algorithms.pso.State: The state of the PSO algorithm.
-        nbest_topology: dict: Containing neighbourhood best index for each
-            particle index.
-        idx_particle: tuple: Tuple of the index of the particle and the
-            particle itself.
-
-    Returns:
-        cipy.algorithms.pso.Particle: A new particle with the updated position
-        and velocity.
-
-    """
-    (idx, particle) = idx_particle
-
-    nbest = state.swarm[nbest_topology[idx]].best_position
-
-    velocity = std_velocity_with_v_max(particle, nbest, state)
-    position = std_position(particle.position, velocity)
-    return particle._replace(position=position, velocity=velocity)
+def clamp(velocity, v_max):
+    return velocity if v_max is None else np.clip(velocity, -v_max, v_max)
 
 
-def update_fitness(problem, particle):
-    """ Calculates and updates the fitness and best_fitness of a particle.
-
-    Fitness is calculated using the 'problem.fitness' function.
-
-    Args:
-        problem: The optimization problem encapsulating the fitness function
-            and optimization type.
-        particle: cipy.algorithms.pso.Particle: Particle to update the fitness
-            for.
-
-    Returns:
-        cipy.algorithms.pso.Particle: A new particle with the updated fitness.
-
-    """
-    fitness = problem.fitness(particle.position)
-    best_fitness = particle.best_fitness
-    cmp = comparator(fitness)
-    if best_fitness is None or cmp(fitness, best_fitness):
-        best_position = particle.position
-        return particle._replace(fitness=fitness,
-                                 best_fitness=fitness,
-                                 best_position=best_position)
-    else:
-        return particle._replace(fitness=fitness)
-
-
-def init_particle(rng, domain):
-    """ Initializes a particle within a domain.
-    Args:
-        rng: numpy.random.RandomState: The random number generator.
-        domain: cipy.problems.core.Domain: The domain of the problem.
-
-    Returns:
-        cipy.algorithms.pso.Particle: A new, fully initialized particle.
-    """
-    position = rng.uniform(domain.lower, domain.upper, domain.dimension)
-    return Particle(position=position,
-                    velocity=np.zeros(domain.dimension),
-                    fitness=None,
-                    best_fitness=None,
-                    best_position=position)
-
-
-def init_swarm(rng, size, domain):
-    return [init_particle(rng, domain) for particle in range(size)]
-
-
-def default_parameters():
-    return {'swarm_size': 25, 'n_s': 5, 'inertia': 0.729844,
-            'c_1': 1.496180, 'c_2': 1.496180, 'v_max': None,
-            'topology': gbest_topology, 'seed': None}
+def __topology__(swarm, social_best):
+    return dict([(idx, social_best(idx)) for idx in range(len(swarm))])
 
 
 def __init_parameters__(params):
     return {**default_parameters(), **({} if params is None else params)}
 
 
-def pso(problem, stopping_condition, parameters=None):
-    """ Perform particle swarm optimization of the given fitness function.
+def __solution__(swarm):
+    """ Determines the global best particle in the swarm.
+
     Args:
-        problem: optimization problem encapsulating the fitness function.
-        stopping_condition: function specifying the stopping condition.
-        parameters: dictionary: parameter dictionary for the PSO.
+        swarm: iterable: an iterable that yields all particles in the swarm.
 
     Returns:
-        cipy.algorithms.pso.Particle: The global best particle.
+        cipy.algorithms.pso.Particle: The best particle in the swarm when
+        comparing the best_fitness values of the particles.
     """
-    params = __init_parameters__(parameters)
-
-    rng = np.random.RandomState(params['seed'])
-    state = State(rng, params,
-                  init_swarm(rng, params['swarm_size'], problem.domain),
-                  iterations=0)
-
-    topology_function = state.params['topology']
-    while not stopping_condition(state):
-        state = state._replace(swarm=[update_fitness(problem, particle)
-                                      for particle in state.swarm])
-
-        nbest_topology = topology_function(state)
-        state = state._replace(swarm=[update_particle(state, nbest_topology, ip)
-                                      for ip in enumerate(state.swarm)],
-                               iterations=state.iterations + 1)
-
-    return global_best(state.swarm)
+    best = swarm[0]
+    cmp = comparator(best.best_fitness)
+    for particle in swarm:
+        if cmp(particle.best_fitness, best.best_fitness):
+            best = particle
+    return best
