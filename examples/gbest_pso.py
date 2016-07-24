@@ -16,7 +16,7 @@
 """
 
 from cipy.algorithms.core import max_iterations
-from cipy.algorithms.pso import pso
+from cipy.algorithms.pso import base
 from cipy.benchmarks import functions
 from cipy.problems.core import Domain, minimize
 from cipy.problems.function import FunctionOptimization
@@ -28,9 +28,9 @@ def main():
     fitness_function = minimize(functions.sphere)
     optimization_problem = FunctionOptimization(fitness=fitness_function,
                                                 domain=Domain(-5.12, 5.12, 30))
-    result = pso(problem=optimization_problem,
-                 stopping_condition=max_iterations(1000),
-                 parameters={'seed': 3758117674})
+    result = base(problem=optimization_problem,
+                  stopping_condition=max_iterations(1000),
+                  parameters={'seed': 3758117674})
 
     print("Result fitness: %s" % result.fitness)
     print("Result: %s" % result.position)

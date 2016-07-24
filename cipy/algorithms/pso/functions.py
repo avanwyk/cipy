@@ -11,67 +11,68 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """ Collection of functions used to implement the PSO algorithm.
-The implementation defined here is the synchronous modified gbest PSO with the
-inertia term as per:
-
-* Shi, Yuhui, and Russell Eberhart. "A modified particle swarm optimizer."
-  Evolutionary Computation Proceedings, 1998.
-  IEEE World Congress on Computational Intelligence.,
-  The 1998 IEEE International Conference on. IEEE, 1998.
-
-Function 'pso' defines the entry point for running the algorithm.
 """
-from collections import namedtuple
 
 import numpy as np
+
+from cipy.algorithms.pso.types import Particle
 from cipy.problems.core import comparator
 
-Particle = namedtuple('Particle',
-                      ['position', 'velocity', 'fitness',
-                       'best_fitness', 'best_position'])
 
-State = namedtuple('State', ['rng', 'params', 'swarm', 'iterations'])
+def std_position(position, velocity):
+    """ Standard particle position update.
+
+    Args:
+        position: numpy.ndarray: The current position.
+        velocity: numpy.ndarray: The particle velocity.
+
+    Returns:
+        numpy.ndarray: the calculated position.
+    """
+    return position + velocity
+
+
+def std_velocity(particle, social, state):
+    """ Standard particle velocity update.
+
+    Args:
+        particle: cipy.algorithms.pso.Particle: Particle to update the velocity
+            for.
+        social: cipy.algorithms.pso.Particle: The social best for the particle.
+        state: cipy.algorithms.pso.State: The state of the PSO algorithm.
+
+    Returns:
+        numpy.ndarray: the calculated velocity.
+    """
+    inertia = state.params['inertia']
+    c_1, c_2 = state.params['c_1'], state.params['c_2']
+    size = particle.position.size
+
+    c_1r_1 = state.rng.uniform(0.0, c_1, size)
+    c_2r_2 = state.rng.uniform(0.0, c_2, size)
+
+    return (inertia * particle.velocity +
+            c_1r_1 * (particle.best_position - particle.position) +
+            c_2r_2 * (social - particle.position))
+
+
+def std_velocity_with_v_max(particle, social, state):
+    return clamp(std_velocity(particle, social, state), state.params['v_max'])
+
+
+def clamp(velocity, v_max):
+    return velocity if v_max is None else np.clip(velocity, -v_max, v_max)
+
+
+def std_parameter_update(state, problem):
+    return state
 
 
 def default_parameters():
     return {'swarm_size': 25, 'n_s': 5, 'inertia': 0.729844,
             'c_1': 1.496180, 'c_2': 1.496180, 'v_max': None,
             'topology': gbest_topology, 'seed': None}
-
-
-def pso(problem, stopping_condition, parameters=None):
-    """ Perform particle swarm optimization of the given fitness function.
-    Args:
-        problem: optimization problem encapsulating the fitness function.
-        stopping_condition: function specifying the stopping condition.
-        parameters: dictionary: parameter dictionary for the PSO.
-
-    Returns:
-        cipy.algorithms.pso.Particle: The global best particle.
-    """
-    params = __init_parameters__(parameters)
-
-    rng = np.random.RandomState(params['seed'])
-
-    initial_swarm = [init_particle(rng, problem.domain)
-                     for i in range(params['swarm_size'])]
-    state = State(rng, params, initial_swarm, iterations=0)
-
-    topology_function = state.params['topology']
-
-    while not stopping_condition(state):
-        state = state._replace(swarm=[update_fitness(problem, particle)
-                                      for particle in state.swarm])
-
-        n_bests = topology_function(state)
-
-        state = state._replace(swarm=[update_particle(state, n_bests, ip)
-                                      for ip in enumerate(state.swarm)],
-                               iterations=state.iterations + 1)
-
-    return __solution__(state.swarm)
 
 
 def init_particle(rng, domain):
@@ -118,7 +119,8 @@ def update_fitness(problem, particle):
         return particle._replace(fitness=fitness)
 
 
-def update_particle(state, nbest_topology, idx_particle):
+def update_particle(position_update, velocity_update, state, nbest_topology,
+                    idx_particle):
     """ Update function for a particle.
 
     Calculates and updates the velocity and position of a particle for a
@@ -141,8 +143,8 @@ def update_particle(state, nbest_topology, idx_particle):
 
     nbest = state.swarm[nbest_topology[idx]].best_position
 
-    velocity = std_velocity_with_v_max(particle, nbest, state)
-    position = std_position(particle.position, velocity)
+    velocity = velocity_update(particle, nbest, state)
+    position = position_update(particle.position, velocity)
     return particle._replace(position=position, velocity=velocity)
 
 
@@ -198,51 +200,6 @@ def lbest_idx(state, idx):
     return best
 
 
-def std_position(position, velocity):
-    """ Standard particle position update.
-
-    Args:
-        position: numpy.ndarray: The current position.
-        velocity: numpy.ndarray: The particle velocity.
-
-    Returns:
-        numpy.ndarray: the calculated position.
-    """
-    return position + velocity
-
-
-def std_velocity(particle, social, state):
-    """ Standard particle velocity update.
-
-    Args:
-        particle: cipy.algorithms.pso.Particle: Particle to update the velocity
-            for.
-        social: cipy.algorithms.pso.Particle: The social best for the particle.
-        state: cipy.algorithms.pso.State: The state of the PSO algorithm.
-
-    Returns:
-        numpy.ndarray: the calculated velocity.
-    """
-    inertia = state.params['inertia']
-    c_1, c_2 = state.params['c_1'], state.params['c_2']
-    size = particle.position.size
-
-    c_1r_1 = state.rng.uniform(0.0, c_1, size)
-    c_2r_2 = state.rng.uniform(0.0, c_2, size)
-
-    return (inertia * particle.velocity +
-            c_1r_1 * (particle.best_position - particle.position) +
-            c_2r_2 * (social - particle.position))
-
-
-def std_velocity_with_v_max(particle, social, state):
-    return clamp(std_velocity(particle, social, state), state.params['v_max'])
-
-
-def clamp(velocity, v_max):
-    return velocity if v_max is None else np.clip(velocity, -v_max, v_max)
-
-
 def __topology__(swarm, social_best):
     return dict([(idx, social_best(idx)) for idx in range(len(swarm))])
 
@@ -251,7 +208,7 @@ def __init_parameters__(params):
     return {**default_parameters(), **({} if params is None else params)}
 
 
-def __solution__(swarm):
+def solution(swarm):
     """ Determines the global best particle in the swarm.
 
     Args:

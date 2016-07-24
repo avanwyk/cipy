@@ -12,27 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Unit tests for the cipy.algorithms.core module.
-"""
-import pytest
-
-import cipy.algorithms.core as core
-import cipy.algorithms.pso.types as types
+from collections import namedtuple
 
 
-@pytest.mark.parametrize("iterations", [
-    0,
-    1,
-    10,
-    15
-])
-@pytest.mark.parametrize("max_iterations", [
-    0,
-    1,
-    10
-])
-def test_maximum_iterations(iterations, max_iterations):
-    stopping_condition = core.max_iterations(max_iterations)
+Particle = namedtuple('Particle',
+                      ['position', 'velocity', 'fitness',
+                       'best_fitness', 'best_position'])
 
-    state = types.State(rng=None, params=None, swarm=None, iterations=iterations)
-    assert stopping_condition(state) == (iterations >= max_iterations)
+State = namedtuple('State', ['rng', 'params', 'swarm', 'iterations'])

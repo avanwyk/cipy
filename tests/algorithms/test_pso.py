@@ -17,12 +17,15 @@
 import pytest
 import numpy as np
 
-import cipy.algorithms.pso as pso
-
+from cipy.algorithms.pso.functions import solution
 from cipy.algorithms.core import max_iterations
-from cipy.benchmarks import functions
+from cipy.benchmarks import functions as benchmarks
 from cipy.problems.core import Domain, Minimum, minimize
 from cipy.problems.function import FunctionOptimization
+
+from cipy.algorithms.pso import base
+from cipy.algorithms.pso import functions
+from cipy.algorithms.pso import types
 
 
 @pytest.fixture
@@ -41,7 +44,7 @@ def test_solution(rng, swarm_size):
              for i in range(swarm_size)]
 
     desired = sorted(swarm, key=lambda p: p.best_fitness)[0]
-    actual = pso.__solution__(swarm)
+    actual = solution(swarm)
 
     assert desired == actual
 
@@ -61,7 +64,7 @@ def test_gbest(rng, swarm_size, dimension):
              for i in range(swarm_size)]
 
     desired = sorted(enumerate(swarm), key=lambda ip: ip[1].best_fitness)[0][0]
-    actual = pso.gbest_idx(swarm)
+    actual = functions.gbest_idx(swarm)
 
     assert actual == desired
 
@@ -80,7 +83,7 @@ def test_standard_position(rng, dimension):
     for i in range(dimension):
         desired[i] = position[i] + velocity[i]
 
-    actual = pso.std_position(position, velocity)
+    actual = functions.std_position(position, velocity)
 
     np.testing.assert_allclose(actual, desired)
 
@@ -93,10 +96,10 @@ def test_execution(dimension):
     """ Smoke test for PSO algorithm testing complete execution of algorithm.
     """
     domain = Domain(-5.12, 5.12, dimension)
-    fitness = minimize(functions.sphere)
+    fitness = minimize(benchmarks.sphere)
     optimization_problem = FunctionOptimization(fitness=fitness,
                                                 domain=domain)
-    result = pso.pso(problem=optimization_problem,
+    result = base.optimize(problem=optimization_problem,
                      stopping_condition=max_iterations(2),
                      parameters={'seed': 3758117674})
 
@@ -111,14 +114,14 @@ def test_execution(dimension):
     100
 ])
 def test_parameter_initialization(swarm_size):
-    params = pso.__init_parameters__({"swarm_size": swarm_size})
+    params = functions.__init_parameters__({"swarm_size": swarm_size})
     assert params["swarm_size"] == swarm_size
 
-    params = pso.__init_parameters__({})
+    params = base.__init_parameters__({})
     assert params["swarm_size"] is not None
 
 
 def mk_particle(position=None, velocity=None, fitness=None,
                 best_fitness=None, best_position=None):
-    return pso.Particle(position, velocity, fitness, best_fitness,
+    return types.Particle(position, velocity, fitness, best_fitness,
                         best_position)
