@@ -19,4 +19,5 @@ Particle = namedtuple('Particle',
                       ['position', 'velocity', 'fitness',
                        'best_fitness', 'best_position'])
 
-State = namedtuple('State', ['rng', 'params', 'swarm', 'iterations'])
+State = namedtuple('State',
+                   ['rng', 'params', 'swarm', 'iterations'])

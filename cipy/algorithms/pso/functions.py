@@ -49,8 +49,8 @@ def std_velocity(particle, social, state):
     c_1, c_2 = state.params['c_1'], state.params['c_2']
     size = particle.position.size
 
-    c_1r_1 = state.rng.uniform(0.0, c_1, size)
-    c_2r_2 = state.rng.uniform(0.0, c_2, size)
+    c_1r_1 = c_1 * state.rng.uniform(0.0, 1.0, size)
+    c_2r_2 = c_2 * state.rng.uniform(0.0, 1.0, size)
 
     return (inertia * particle.velocity +
             c_1r_1 * (particle.best_position - particle.position) +
@@ -63,6 +63,31 @@ def std_velocity_with_v_max(particle, social, state):
 
 def clamp(velocity, v_max):
     return velocity if v_max is None else np.clip(velocity, -v_max, v_max)
+
+
+def gc_velocity_update(particle, social, state):
+    """ Guaranteed convergence velocity update.
+
+    Args:
+        particle: cipy.algorithms.pso.Particle: Particle to update the velocity
+            for.
+        social: cipy.algorithms.pso.Particle: The social best for the particle.
+        state: cipy.algorithms.pso.State: The state of the PSO algorithm.
+
+    Returns:
+        numpy.ndarray: the calculated velocity.
+    """
+    gbest_position = state.swarm[gbest_idx(state.swarm)].position
+    if not np.array_equal(gbest_position, particle.position):
+        return std_velocity_with_v_max(particle, social, state)
+
+    rho = state.params['rho']
+    inertia = state.params['inertia']
+    size = particle.position.size
+
+    r2 = state.rng.uniform(0.0, 1.0, size)
+    return (-1 * particle.position + gbest_position + inertia *
+            particle.velocity + rho * (1 - 2 * r2))
 
 
 def std_parameter_update(state, problem):
@@ -200,12 +225,38 @@ def lbest_idx(state, idx):
     return best
 
 
-def __topology__(swarm, social_best):
-    return dict([(idx, social_best(idx)) for idx in range(len(swarm))])
+def update_rho(state, problem):
+    params = state.params
 
+    rho = params['rho']
+    e_s = params['e_s']
+    e_f = params['e_f']
 
-def __init_parameters__(params):
-    return {**default_parameters(), **({} if params is None else params)}
+    successes = params.get('successes', 0)
+    failures = params.get('failures', 0)
+
+    global_best = solution(state.swarm)
+    fitness = problem.fitness(global_best.position)
+    cmp = comparator(global_best.best_fitness)
+    if cmp(fitness, global_best.best_fitness):
+        successes += 1
+        failures = 0
+    else:
+        failures += 1
+        successes = 0
+
+    if successes > e_s:
+        rho *= 2
+    elif failures > e_f:
+        rho *= 0.5
+    else:
+        rho = rho
+
+    params['rho'] = rho
+    params['successes'] = successes
+    params['failures'] = failures
+
+    return state._replace(params=params)
 
 
 def solution(swarm):
@@ -224,3 +275,11 @@ def solution(swarm):
         if cmp(particle.best_fitness, best.best_fitness):
             best = particle
     return best
+
+
+def __topology__(swarm, social_best):
+    return dict([(idx, social_best(idx)) for idx in range(len(swarm))])
+
+
+def __init_parameters__(params):
+    return {**default_parameters(), **({} if params is None else params)}
