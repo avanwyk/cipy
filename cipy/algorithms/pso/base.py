@@ -25,6 +25,7 @@ Function 'pso' defines the entry point for running the algorithm.
 """
 import numpy as np
 
+from cipy.algorithms.core import dictionary_based_measurements
 from cipy.algorithms.pso import functions
 from cipy.algorithms.pso import types
 
@@ -32,7 +33,9 @@ from cipy.algorithms.pso import types
 def optimize(problem, stopping_condition, parameters=None,
              position_update=functions.std_position,
              velocity_update=functions.std_velocity_with_v_max,
-             parameter_update=functions.std_parameter_update):
+             parameter_update=functions.std_parameter_update,
+             measurements=(),
+             measurer=dictionary_based_measurements):
     """ Perform particle swarm optimization of the given fitness function.
     Args:
         problem: optimization problem encapsulating the fitness function.
@@ -49,12 +52,13 @@ def optimize(problem, stopping_condition, parameters=None,
     initial_swarm = [functions.init_particle(rng, problem.domain,
                                              problem.fitness)
                      for i in range(params['swarm_size'])]
-    state = types.State(rng, params, initial_swarm, iterations=0)
+    state = types.PSOState(rng, params, iterations=0, swarm=initial_swarm)
 
     topology_function = state.params['topology']
     update_fitness = functions.update_fitness
     update_particle = functions.update_particle
 
+    results, measure = measurer(measurements)
     while not stopping_condition(state):
         n_bests = topology_function(state)
 
@@ -69,7 +73,9 @@ def optimize(problem, stopping_condition, parameters=None,
 
         state = parameter_update(state, problem)
 
-    return functions.solution(state.swarm)
+        results = measure(results, state)
+
+    return functions.solution(state.swarm), results
 
 
 def default_parameters():

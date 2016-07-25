@@ -14,6 +14,7 @@
 
 """ Unit tests for the cipy.algorithms.core module.
 """
+import numpy as np
 import pytest
 
 import cipy.algorithms.core as core
@@ -34,5 +35,23 @@ import cipy.algorithms.pso.types as types
 def test_maximum_iterations(iterations, max_iterations):
     stopping_condition = core.max_iterations(max_iterations)
 
-    state = types.State(rng=None, params=None, swarm=None, iterations=iterations)
+    state = types.PSOState(rng=None, params=None, swarm=None, iterations=iterations)
     assert stopping_condition(state) == (iterations >= max_iterations)
+
+
+@pytest.mark.parametrize("max_iterations", [
+    0,
+    1,
+    10
+])
+def test_dictionary_based_collector(max_iterations):
+    measurements = [lambda state: ('fitness', 1.0),
+                    lambda state: ('position', np.array([1,2,3]))]
+
+    (results, collect) = core.dictionary_based_measurements(measurements)
+    for iteration in range(max_iterations):
+        state = core.State(rng=None, params={}, iterations=iteration)
+        results = collect(results, state)
+    assert len(results.keys()) == max_iterations
+    for key in results.keys():
+        assert len(results[key].keys()) == len(measurements)

@@ -14,10 +14,11 @@
 
 from collections import namedtuple
 
+from cipy.algorithms.core import State
 
 Particle = namedtuple('Particle',
                       ['position', 'velocity', 'fitness',
                        'best_fitness', 'best_position'])
 
-State = namedtuple('State',
-                   ['rng', 'params', 'swarm', 'iterations'])
+
+PSOState = namedtuple('PSO', State._fields + ('swarm',))

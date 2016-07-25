@@ -272,5 +272,10 @@ def solution(swarm):
     return best
 
 
+def fitness_measurement(state):
+    swarm = state.swarm
+    return 'fitness', swarm[gbest_idx(swarm)].best_fitness
+
+
 def __topology__(swarm, social_best):
     return dict([(idx, social_best(idx)) for idx in range(len(swarm))])

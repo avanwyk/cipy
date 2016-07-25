@@ -14,7 +14,8 @@
 
 """ Example of lbest PSO algorithm
 """
-from algorithms.pso.functions import lbest_topology
+from cipy.algorithms.pso.functions import fitness_measurement
+from cipy.algorithms.pso.functions import lbest_topology
 from cipy.algorithms.core import max_iterations
 from cipy.algorithms.pso import optimize
 from cipy.benchmarks import functions
@@ -29,13 +30,15 @@ def main():
     optimization_problem = FunctionOptimization(fitness_function,
                                                 domain=Domain(-5.12, 5.12, 30))
 
-    result = optimize(problem=optimization_problem,
-                      stopping_condition=max_iterations(1000),
-                      parameters={'seed': 3758117674,
-                                  'topology': lbest_topology, 'n_s': 5})
+    (solution, metrics) = optimize(problem=optimization_problem,
+                                   stopping_condition=max_iterations(1000),
+                                   parameters={'seed': 3758117674,
+                                               'topology': lbest_topology,
+                                               'n_s': 5},
+                                   measurements=[fitness_measurement])
 
-    print("Result fitness: %s" % result.fitness)
-    print("Result: %s" % result.position)
+    print("Result fitness: %s" % solution.fitness)
+    print("Result: %s" % solution.position)
 
 
 if __name__ == "__main__":

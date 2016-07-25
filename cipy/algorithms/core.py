@@ -14,9 +14,25 @@
 
 """ Module defining core utility types and functions used by algorithms.
 """
+from collections import namedtuple
+
+
+State = namedtuple('State',
+                   ['rng', 'params', 'iterations'])
 
 
 def max_iterations(maximum):
     def max_iterations_(state):
         return state.iterations >= maximum
     return max_iterations_
+
+
+def dictionary_based_measurements(measurements):
+    def collect(results, state):
+        for measurement in measurements:
+            (label, value) = measurement(state)
+            iteration_dict = results.get(state.iterations, {})
+            iteration_dict[label] = str(value)
+            results[state.iterations] = iteration_dict
+        return results
+    return {}, collect

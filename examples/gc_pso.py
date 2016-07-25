@@ -14,9 +14,11 @@
 
 """ Example of gbest PSO algorithm
 """
-from algorithms.pso.functions import gc_velocity_update, update_rho
 from cipy.algorithms.core import max_iterations
 from cipy.algorithms.pso import optimize
+from cipy.algorithms.pso.functions import fitness_measurement
+from cipy.algorithms.pso.functions import gc_velocity_update
+from cipy.algorithms.pso.functions import update_rho
 from cipy.benchmarks import functions
 from cipy.problems.core import Domain, minimize
 from cipy.problems.function import FunctionOptimization
@@ -28,15 +30,16 @@ def main():
     fitness_function = minimize(functions.sphere)
     optimization_problem = FunctionOptimization(fitness=fitness_function,
                                                 domain=Domain(-5.12, 5.12, 30))
-    result = optimize(problem=optimization_problem,
-                      stopping_condition=max_iterations(1000),
-                      parameters={'seed': 3758117674,
-                                  'rho': 1.0, 'e_s': 15, 'e_f': 5},
-                      velocity_update=gc_velocity_update,
-                      parameter_update=update_rho)
+    (solution, metrics) = optimize(problem=optimization_problem,
+                                   stopping_condition=max_iterations(1000),
+                                   parameters={'seed': 3758117674,
+                                               'rho': 1.0, 'e_s': 15, 'e_f': 5},
+                                   velocity_update=gc_velocity_update,
+                                   parameter_update=update_rho,
+                                   measurements=[fitness_measurement])
 
-    print("Result fitness: %s" % result.fitness)
-    print("Result: %s" % result.position)
+    print("Result fitness: %s" % solution.fitness)
+    print("Result: %s" % solution.position)
 
 
 if __name__ == "__main__":

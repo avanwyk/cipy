@@ -99,12 +99,12 @@ def test_execution(dimension):
     fitness = minimize(benchmarks.sphere)
     optimization_problem = FunctionOptimization(fitness=fitness,
                                                 domain=domain)
-    result = base.optimize(problem=optimization_problem,
-                     stopping_condition=max_iterations(2),
-                     parameters={'seed': 3758117674})
+    (solution, results) = base.optimize(problem=optimization_problem,
+                                        stopping_condition=max_iterations(2),
+                                        parameters={'seed': 3758117674})
 
-    assert result.fitness != np.nan
-    assert result.position.size == dimension
+    assert solution.fitness != np.nan
+    assert solution.position.size == dimension
 
 
 @pytest.mark.parametrize("swarm_size", [
@@ -124,4 +124,4 @@ def test_parameter_initialization(swarm_size):
 def mk_particle(position=None, velocity=None, fitness=None,
                 best_fitness=None, best_position=None):
     return types.Particle(position, velocity, fitness, best_fitness,
-                        best_position)
+                          best_position)
