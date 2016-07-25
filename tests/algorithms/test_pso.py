@@ -114,7 +114,7 @@ def test_execution(dimension):
     100
 ])
 def test_parameter_initialization(swarm_size):
-    params = functions.__init_parameters__({"swarm_size": swarm_size})
+    params = base.__init_parameters__({"swarm_size": swarm_size})
     assert params["swarm_size"] == swarm_size
 
     params = base.__init_parameters__({})
