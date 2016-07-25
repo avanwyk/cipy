@@ -46,7 +46,8 @@ def optimize(problem, stopping_condition, parameters=None,
 
     rng = np.random.RandomState(params['seed'])
 
-    initial_swarm = [functions.init_particle(rng, problem.domain)
+    initial_swarm = [functions.init_particle(rng, problem.domain,
+                                             problem.fitness)
                      for i in range(params['swarm_size'])]
     state = types.State(rng, params, initial_swarm, iterations=0)
 
@@ -55,15 +56,15 @@ def optimize(problem, stopping_condition, parameters=None,
     update_particle = functions.update_particle
 
     while not stopping_condition(state):
-        state = state._replace(swarm=[update_fitness(problem, particle)
-                                      for particle in state.swarm])
-
         n_bests = topology_function(state)
 
         state = state._replace(swarm=[update_particle(position_update,
                                                       velocity_update,
                                                       state, n_bests, ip)
-                                      for ip in enumerate(state.swarm)],
+                                      for ip in enumerate(state.swarm)])
+
+        state = state._replace(swarm=[update_fitness(problem, particle)
+                                      for particle in state.swarm],
                                iterations=state.iterations + 1)
 
         state = parameter_update(state, problem)

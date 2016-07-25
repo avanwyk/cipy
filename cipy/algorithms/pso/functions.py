@@ -94,7 +94,7 @@ def std_parameter_update(state, problem):
     return state
 
 
-def init_particle(rng, domain):
+def init_particle(rng, domain, fitness_function):
     """ Initializes a particle within a domain.
     Args:
         rng: numpy.random.RandomState: The random number generator.
@@ -104,10 +104,11 @@ def init_particle(rng, domain):
         cipy.algorithms.pso.Particle: A new, fully initialized particle.
     """
     position = rng.uniform(domain.lower, domain.upper, domain.dimension)
+    fitness = fitness_function(position)
     return Particle(position=position,
                     velocity=np.zeros(domain.dimension),
-                    fitness=None,
-                    best_fitness=None,
+                    fitness=fitness,
+                    best_fitness=fitness,
                     best_position=position)
 
 
