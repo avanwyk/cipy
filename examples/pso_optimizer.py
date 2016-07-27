@@ -12,6 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Module defining types and functions for encapsulating function optimization
-problems.
-"""
+from cipy.algorithms.core import max_iterations
+from cipy.benchmarks.functions import sphere
+from cipy.optimizers.pso_optimizer import PSOOptimizer
+
+
+def main():
+    optimizer = PSOOptimizer()
+    solution = optimizer.minimize(sphere, -5.12, 5.12, 30,
+                                  max_iterations(1000))
+
+    print(solution)
+    print(optimizer.accuracy())
+
+
+if __name__ == "__main__":
+    main()

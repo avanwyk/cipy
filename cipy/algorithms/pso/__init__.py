@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .base import default_parameters
 from .base import optimize
+from .functions import gc_velocity_update
+from .functions import std_parameter_update
+from .functions import std_position
+from .functions import std_velocity_with_v_max
+from .functions import update_rho
 
-__all__ = ['optimize']
+__all__ = ['optimize', 'default_params', 'std_position',
+           'std_velocity_with_v_max', 'gc_velocity_update', 'update_rho']
+
