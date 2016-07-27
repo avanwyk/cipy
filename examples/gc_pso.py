@@ -21,16 +21,14 @@ from cipy.algorithms.pso.functions import gc_velocity_update
 from cipy.algorithms.pso.functions import update_rho
 from cipy.benchmarks import functions
 from cipy.problems.core import Domain, minimize
-from cipy.problems.function import FunctionOptimization
 
 
 def main():
     """ Main function to execute gbest GC PSO algorithm.
     """
-    fitness_function = minimize(functions.sphere)
-    optimization_problem = FunctionOptimization(fitness=fitness_function,
-                                                domain=Domain(-5.12, 5.12, 30))
-    (solution, metrics) = optimize(problem=optimization_problem,
+    objective_function = minimize(functions.sphere)
+    (solution, metrics) = optimize(objective_function=objective_function,
+                                   domain=Domain(-5.12, 5.12, 30),
                                    stopping_condition=max_iterations(1000),
                                    parameters={'seed': 3758117674,
                                                'rho': 1.0, 'e_s': 15, 'e_f': 5},

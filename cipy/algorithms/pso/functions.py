@@ -90,7 +90,7 @@ def gc_velocity_update(particle, social, state):
             particle.velocity + rho * (1 - 2 * r2))
 
 
-def std_parameter_update(state, problem):
+def std_parameter_update(state, objective_function):
     return state
 
 
@@ -112,7 +112,7 @@ def init_particle(rng, domain, fitness_function):
                     best_position=position)
 
 
-def update_fitness(problem, particle):
+def update_fitness(objective_function, particle):
     """ Calculates and updates the fitness and best_fitness of a particle.
 
     Fitness is calculated using the 'problem.fitness' function.
@@ -127,7 +127,7 @@ def update_fitness(problem, particle):
         cipy.algorithms.pso.Particle: A new particle with the updated fitness.
 
     """
-    fitness = problem.fitness(particle.position)
+    fitness = objective_function(particle.position)
     best_fitness = particle.best_fitness
     cmp = comparator(fitness)
     if best_fitness is None or cmp(fitness, best_fitness):
@@ -220,7 +220,7 @@ def lbest_idx(state, idx):
     return best
 
 
-def update_rho(state, problem):
+def update_rho(state, objective_function):
     params = state.params
 
     rho = params['rho']
@@ -231,7 +231,7 @@ def update_rho(state, problem):
     failures = params.get('failures', 0)
 
     global_best = solution(state.swarm)
-    fitness = problem.fitness(global_best.position)
+    fitness = objective_function(global_best.position)
     cmp = comparator(global_best.best_fitness)
     if cmp(fitness, global_best.best_fitness):
         successes += 1

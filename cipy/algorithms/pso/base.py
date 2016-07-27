@@ -30,7 +30,8 @@ from cipy.algorithms.pso import functions
 from cipy.algorithms.pso import types
 
 
-def optimize(problem, stopping_condition, parameters=None,
+def optimize(objective_function, domain,
+             stopping_condition, parameters=None,
              position_update=functions.std_position,
              velocity_update=functions.std_velocity_with_v_max,
              parameter_update=functions.std_parameter_update,
@@ -38,7 +39,7 @@ def optimize(problem, stopping_condition, parameters=None,
              measurer=dictionary_based_measurements):
     """ Perform particle swarm optimization of the given fitness function.
     Args:
-        problem: optimization problem encapsulating the fitness function.
+        objective_function: the cost function to optimize.
         stopping_condition: function specifying the stopping condition.
         parameters: dictionary: parameter dictionary for the PSO.
 
@@ -49,8 +50,8 @@ def optimize(problem, stopping_condition, parameters=None,
 
     rng = np.random.RandomState(params['seed'])
 
-    initial_swarm = [functions.init_particle(rng, problem.domain,
-                                             problem.fitness)
+    initial_swarm = [functions.init_particle(rng, domain,
+                                             objective_function)
                      for i in range(params['swarm_size'])]
     state = types.PSOState(rng, params, iterations=0, swarm=initial_swarm)
 
@@ -67,11 +68,12 @@ def optimize(problem, stopping_condition, parameters=None,
                                                       state, n_bests, ip)
                                       for ip in enumerate(state.swarm)])
 
-        state = state._replace(swarm=[update_fitness(problem, particle)
+        state = state._replace(swarm=[update_fitness(objective_function,
+                                                     particle)
                                       for particle in state.swarm],
                                iterations=state.iterations + 1)
 
-        state = parameter_update(state, problem)
+        state = parameter_update(state, objective_function)
 
         results = measure(results, state)
 

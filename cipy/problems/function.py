@@ -15,9 +15,3 @@
 """ Module defining types and functions for encapsulating function optimization
 problems.
 """
-
-from collections import namedtuple
-
-
-FunctionOptimization = namedtuple('FunctionOptimization',
-                                  ['fitness', 'domain'])

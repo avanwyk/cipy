@@ -14,18 +14,15 @@
 
 """ Unit tests for the cipy.algorithms.pso module.
 """
-import pytest
 import numpy as np
-
-from cipy.algorithms.pso.functions import solution
+import pytest
 from cipy.algorithms.core import max_iterations
-from cipy.benchmarks import functions as benchmarks
-from cipy.problems.core import Domain, Minimum, minimize
-from cipy.problems.function import FunctionOptimization
-
 from cipy.algorithms.pso import base
 from cipy.algorithms.pso import functions
 from cipy.algorithms.pso import types
+from cipy.algorithms.pso.functions import solution
+from cipy.benchmarks import functions as benchmarks
+from cipy.problems.core import Domain, Minimum, minimize
 
 
 @pytest.fixture
@@ -95,11 +92,9 @@ def test_standard_position(rng, dimension):
 def test_execution(dimension):
     """ Smoke test for PSO algorithm testing complete execution of algorithm.
     """
-    domain = Domain(-5.12, 5.12, dimension)
-    fitness = minimize(benchmarks.sphere)
-    optimization_problem = FunctionOptimization(fitness=fitness,
-                                                domain=domain)
-    (solution, results) = base.optimize(problem=optimization_problem,
+    objective_function = minimize(benchmarks.sphere)
+    (solution, results) = base.optimize(objective_function=objective_function,
+                                        domain=Domain(-5.12, 5.12, dimension),
                                         stopping_condition=max_iterations(2),
                                         parameters={'seed': 3758117674})
 
