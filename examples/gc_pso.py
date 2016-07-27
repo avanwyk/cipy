@@ -25,7 +25,7 @@ from cipy.problems.function import FunctionOptimization
 
 
 def main():
-    """ Main function to execute gbest PSO algorithm.
+    """ Main function to execute gbest GC PSO algorithm.
     """
     fitness_function = minimize(functions.sphere)
     optimization_problem = FunctionOptimization(fitness=fitness_function,
