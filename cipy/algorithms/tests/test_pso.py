@@ -23,7 +23,9 @@ from cipy.algorithms.core import minimize
 from cipy.algorithms.pso import base
 from cipy.algorithms.pso import functions
 from cipy.algorithms.pso import types
-from cipy.algorithms.pso.functions import solution
+from cipy.algorithms.pso.functions import solution, lbest_topology, \
+    gc_velocity_update, update_rho, gbest_topology
+from cipy.algorithms.pso.functions import fitness_measurement
 from cipy.benchmarks import functions as benchmarks
 
 
@@ -87,23 +89,6 @@ def test_standard_position(rng, dimension):
     np.testing.assert_allclose(actual, desired)
 
 
-@pytest.mark.parametrize("dimension", [
-    1,
-    30
-])
-def test_execution(dimension):
-    """ Smoke test for PSO algorithm testing complete execution of algorithm.
-    """
-    objective_function = minimize(benchmarks.sphere)
-    (solution, results) = base.optimize(objective_function=objective_function,
-                                        domain=Domain(-5.12, 5.12, dimension),
-                                        stopping_condition=max_iterations(2),
-                                        parameters={'seed': 3758117674})
-
-    assert solution.fitness != np.nan
-    assert solution.position.size == dimension
-
-
 @pytest.mark.parametrize("swarm_size", [
     0,
     1,
@@ -122,3 +107,64 @@ def mk_particle(position=None, velocity=None, fitness=None,
                 best_fitness=None, best_position=None):
     return types.Particle(position, velocity, fitness, best_fitness,
                           best_position)
+
+
+@pytest.mark.parametrize("dimension", [
+    1,
+    30
+])
+def test_gbest_pso(dimension):
+    """ Smoke test for PSO algorithm testing complete execution of algorithm.
+    """
+    objective_function = minimize(benchmarks.sphere)
+    (solution, metrics) = base.optimize(objective_function=objective_function,
+                                   domain=Domain(-5.12, 5.12, dimension),
+                                   stopping_condition=max_iterations(3),
+                                   parameters={'seed': 3758117674,
+                                               'topology': gbest_topology},
+                                   measurements=[fitness_measurement])
+
+    assert solution.fitness != np.nan
+    assert solution.position.size == dimension
+
+
+@pytest.mark.parametrize("dimension", [
+    1,
+    30
+])
+def test_lbest_pso(dimension):
+    """ Smoke test for PSO algorithm testing complete execution of algorithm.
+    """
+    objective_function = minimize(benchmarks.sphere)
+    (solution, metrics) = base.optimize(objective_function=objective_function,
+                                        domain=Domain(-5.12, 5.12, dimension),
+                                        stopping_condition=max_iterations(3),
+                                        parameters={'seed': 3758117674,
+                                                    'topology': lbest_topology,
+                                                    'n_s': 5},
+                                        measurements=[fitness_measurement])
+
+    assert solution.fitness != np.nan
+    assert solution.position.size == dimension
+
+
+@pytest.mark.parametrize("dimension", [
+    1,
+    30
+])
+def test_gc_pso(dimension):
+    """ Smoke test for PSO algorithm testing complete execution of algorithm.
+    """
+    objective_function = minimize(benchmarks.sphere)
+    (solution, metrics) = base.optimize(objective_function=objective_function,
+                                        domain=Domain(-5.12, 5.12, dimension),
+                                        stopping_condition=max_iterations(3),
+                                        parameters={'seed': 3758117674,
+                                                    'rho': 1.0, 'e_s': 15,
+                                                    'e_f': 5},
+                                        velocity_update=gc_velocity_update,
+                                        parameter_update=update_rho,
+                                        measurements=[fitness_measurement])
+
+    assert solution.fitness != np.nan
+    assert solution.position.size == dimension
