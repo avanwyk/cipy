@@ -16,14 +16,16 @@
 """
 from collections import namedtuple
 
-
-State = namedtuple('State',
-                   ['rng', 'params', 'iterations'])
+State = namedtuple('State', ['rng', 'params', 'iterations'])
+Domain = namedtuple('Domain', ['lower', 'upper', 'dimension'])
+Minimum = namedtuple('Minimum', ['val'])
+Maximum = namedtuple('Maximum', ['val'])
 
 
 def max_iterations(maximum):
     def max_iterations_(state):
         return state.iterations >= maximum
+
     return max_iterations_
 
 
@@ -35,4 +37,26 @@ def dictionary_based_measurements(measurements):
             iteration_dict[label] = str(value)
             results[state.iterations] = iteration_dict
         return results
+
     return {}, collect
+
+
+def minimize(fitness_function):
+    def objective_function(x):
+        return Minimum(fitness_function(x))
+
+    return objective_function
+
+
+def maximize(fitness_function):
+    def objective_function(x):
+        return Maximum(fitness_function(x))
+
+    return objective_function
+
+
+def comparator(p):
+    if isinstance(p, Minimum):
+        return lambda l, r: l < r
+    else:
+        return lambda l, r: l > r

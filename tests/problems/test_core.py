@@ -14,39 +14,3 @@
 
 """ Unit tests for the cipy.problems.core module.
 """
-import pytest
-import numpy as np
-
-from cipy.benchmarks.functions import sphere
-
-import cipy.problems.core as core
-
-
-def __unit__(x):
-    return x
-
-
-@pytest.mark.parametrize("fitness_function", [
-    sphere,
-    __unit__
-])
-@pytest.mark.parametrize("solution", [
-    np.array([]),
-    np.array([1,2,3,4,5])
-])
-def test_minimize(fitness_function, solution):
-    minimize = core.minimize(fitness_function)
-    assert isinstance(minimize(solution), core.Minimum)
-
-
-@pytest.mark.parametrize("fitness_function", [
-    sphere,
-    __unit__
-])
-@pytest.mark.parametrize("solution", [
-    np.array([]),
-    np.array([1,2,3,4,5])
-])
-def test_maximize(fitness_function, solution):
-    maximize = core.maximize(fitness_function)
-    assert isinstance(maximize(solution), core.Maximum)

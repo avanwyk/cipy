@@ -15,9 +15,8 @@
 """
 
 import numpy as np
-
+from cipy.algorithms.core import comparator
 from cipy.algorithms.pso.types import Particle
-from cipy.problems.core import comparator
 
 
 def std_position(position, velocity):

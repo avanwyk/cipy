@@ -16,13 +16,15 @@
 """
 import numpy as np
 import pytest
+from cipy.algorithms.core import Domain
+from cipy.algorithms.core import Minimum
 from cipy.algorithms.core import max_iterations
+from cipy.algorithms.core import minimize
 from cipy.algorithms.pso import base
 from cipy.algorithms.pso import functions
 from cipy.algorithms.pso import types
 from cipy.algorithms.pso.functions import solution
 from cipy.benchmarks import functions as benchmarks
-from cipy.problems.core import Domain, Minimum, minimize
 
 
 @pytest.fixture

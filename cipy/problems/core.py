@@ -15,27 +15,3 @@
 """ Module defining core utility types and functions used for optimization
 problems.
 """
-from collections import namedtuple
-
-Domain = namedtuple('Domain', ['lower', 'upper', 'dimension'])
-Minimum = namedtuple('Minimum', ['val'])
-Maximum = namedtuple('Maximum', ['val'])
-
-
-def minimize(fitness_function):
-    def objective_function(x):
-        return Minimum(fitness_function(x))
-    return objective_function
-
-
-def maximize(fitness_function):
-    def objective_function(x):
-        return Maximum(fitness_function(x))
-    return objective_function
-
-
-def comparator(p):
-    if isinstance(p, Minimum):
-        return lambda l, r: l < r
-    else:
-        return lambda l, r: l > r

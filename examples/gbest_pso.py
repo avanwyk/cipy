@@ -14,11 +14,12 @@
 
 """ Example of gbest PSO algorithm
 """
+from cipy.algorithms.core import Domain
 from cipy.algorithms.core import max_iterations
+from cipy.algorithms.core import minimize
 from cipy.algorithms.pso import optimize
 from cipy.algorithms.pso.functions import fitness_measurement
 from cipy.benchmarks import functions
-from cipy.problems.core import Domain, minimize
 
 
 def main():
