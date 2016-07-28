@@ -17,18 +17,18 @@ from cipy.benchmarks.functions import sphere
 from cipy.optimizers.pso_optimizer import PSOOptimizer
 
 
-def main():
+def main(dimension, iterations):
     """ Main function for PSO optimizer example.
 
     Instantiate PSOOptimizer to optimize 30-dimensional spherical function.
     """
     optimizer = PSOOptimizer()
-    solution = optimizer.minimize(sphere, -5.12, 5.12, 30,
-                                  max_iterations(1000))
-
-    print(solution)
-    print(optimizer.accuracy())
+    solution = optimizer.minimize(sphere, -5.12, 5.12, dimension,
+                                  max_iterations(iterations))
+    return solution, optimizer
 
 
 if __name__ == "__main__":
-    main()
+    solution, optimizer = main(30, 1000)
+    print(solution)
+    print(optimizer.accuracy())

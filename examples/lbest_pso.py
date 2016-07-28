@@ -23,21 +23,22 @@ from cipy.algorithms.pso.functions import lbest_topology
 from cipy.benchmarks import functions
 
 
-def main():
+def main(dimension, iterations):
     """ Main function to execute lbest PSO algorithm.
     """
     objective_function = minimize(functions.sphere)
+    stopping_condition = max_iterations(iterations)
     (solution, metrics) = optimize(objective_function=objective_function,
-                                   domain=Domain(-5.12, 5.12, 30),
-                                   stopping_condition=max_iterations(1000),
+                                   domain=Domain(-5.12, 5.12, dimension),
+                                   stopping_condition=stopping_condition,
                                    parameters={'seed': 3758117674,
                                                'topology': lbest_topology,
                                                'n_s': 5},
                                    measurements=[fitness_measurement])
-
-    print("Result fitness: %s" % solution.fitness)
-    print("Result: %s" % solution.position)
+    return solution
 
 
 if __name__ == "__main__":
-    main()
+    solution = main(30, 1000)
+    print("Result fitness: %s" % solution.fitness)
+    print("Result: %s" % solution.position)
