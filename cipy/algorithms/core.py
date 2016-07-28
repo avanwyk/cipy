@@ -29,9 +29,9 @@ def max_iterations(maximum):
     return max_iterations_
 
 
-def dictionary_based_measurements(measurements):
+def dictionary_based_metrics(metrics):
     def collect(results, state):
-        for measurement in measurements:
+        for measurement in metrics:
             (label, value) = measurement(state)
             iteration_dict = results.get(state.iterations, {})
             iteration_dict[label] = str(value)

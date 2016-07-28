@@ -25,7 +25,7 @@ Function 'pso' defines the entry point for running the algorithm.
 """
 import numpy as np
 
-from cipy.algorithms.core import dictionary_based_measurements
+from cipy.algorithms.core import dictionary_based_metrics
 from cipy.algorithms.pso import functions
 from cipy.algorithms.pso import types
 
@@ -36,7 +36,7 @@ def optimize(objective_function, domain,
              velocity_update=functions.std_velocity_with_v_max,
              parameter_update=functions.std_parameter_update,
              measurements=(),
-             measurer=dictionary_based_measurements):
+             measurer=dictionary_based_metrics):
     """ Perform particle swarm optimization of the given fitness function.
     Args:
         objective_function: the cost function to optimize.

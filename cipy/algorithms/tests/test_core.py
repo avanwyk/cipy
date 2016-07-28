@@ -76,7 +76,7 @@ def test_dictionary_based_collector(max_iterations):
     measurements = [lambda state: ('fitness', 1.0),
                     lambda state: ('position', np.array([1, 2, 3]))]
 
-    (results, collect) = core.dictionary_based_measurements(measurements)
+    (results, collect) = core.dictionary_based_metrics(measurements)
     for iteration in range(max_iterations):
         state = core.State(rng=None, params={}, iterations=iteration)
         results = collect(results, state)

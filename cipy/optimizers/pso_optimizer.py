@@ -22,7 +22,7 @@ class PSOOptimizer(object):
                  velocity_update=pso.std_velocity_with_v_max,
                  parameter_update=pso.std_parameter_update,
                  measurements=(),
-                 measurer=core.dictionary_based_measurements):
+                 measurer=core.dictionary_based_metrics):
         self.params = params
         self.position_update = position_update
         self.velocity_update = velocity_update
