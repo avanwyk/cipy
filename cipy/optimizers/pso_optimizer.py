@@ -29,7 +29,7 @@ class PSOOptimizer(object):
         self.parameter_update = parameter_update
         self.measurements = measurements
         self.measurer = measurer
-        self.solution = None
+        self.best_particle = None
         self.metrics = {}
 
     def minimize(self, cost_function, domain_lower, domain_upper, dimension,
@@ -43,7 +43,8 @@ class PSOOptimizer(object):
         return self.optimize(core.maximize(cost_function), domain_lower,
                              domain_upper, dimension, stopping_condition)
 
-    def optimize(self, objective_function, domain_lower, domain_upper, dimension,
+    def optimize(self, objective_function, domain_lower, domain_upper,
+                 dimension,
                  stopping_condition):
         (solution, metrics) = pso.optimize(objective_function,
                                            Domain(domain_lower, domain_upper,
@@ -53,15 +54,16 @@ class PSOOptimizer(object):
                                            self.velocity_update,
                                            self.parameter_update,
                                            self.measurements, self.measurer)
-        self.solution = solution
+        self.best_particle = solution
         self.metrics = metrics
         return solution.best_position
 
     def accuracy(self):
-        return self.solution.best_fitness.val
+        return self.best_particle.best_fitness.val
 
     def solution(self):
-        return None if self.solution is None else self.solution.best_position
+        return (None if self.best_particle is None
+                else self.best_particle.best_position)
 
 
 Domain = core.Domain

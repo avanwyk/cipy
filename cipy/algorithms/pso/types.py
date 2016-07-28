@@ -20,5 +20,4 @@ Particle = namedtuple('Particle',
                       ['position', 'velocity', 'fitness',
                        'best_fitness', 'best_position'])
 
-
-PSOState = namedtuple('PSO', State._fields + ('swarm',))
+PSOState = namedtuple('PSOState', State._fields + ('swarm',))

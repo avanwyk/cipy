@@ -124,10 +124,10 @@ def test_gbest_pso(dimension, iterations):
              'topology': functions.gbest_topology}
     measurements = [functions.fitness_measurement]
 
+    stopping_condition = max_iterations(iterations)
     (solution, metrics) = base.optimize(objective_function=objective_function,
                                         domain=Domain(-5.12, 5.12, dimension),
-                                        stopping_condition=
-                                        max_iterations(iterations),
+                                        stopping_condition=stopping_condition,
                                         parameters=parms,
                                         measurements=measurements)
 
@@ -150,11 +150,11 @@ def test_lbest_pso(dimension, iterations):
     params = {'seed': 3758117674,
               'topology': functions.lbest_topology, 'n_s': 5}
     measurements = [functions.fitness_measurement]
+    stopping_condition = max_iterations(iterations)
 
     (solution, metrics) = base.optimize(objective_function=objective_function,
                                         domain=Domain(-5.12, 5.12, dimension),
-                                        stopping_condition=
-                                        max_iterations(iterations),
+                                        stopping_condition=stopping_condition,
                                         parameters=params,
                                         measurements=measurements)
 
@@ -176,16 +176,16 @@ def test_gc_pso(dimension, iterations):
     objective_function = minimize(benchmarks.sphere)
     parms = {'seed': 3758117674, 'rho': 1.0, 'e_s': 15, 'e_f': 5}
     measurements = [functions.fitness_measurement]
+    stopping_condition = max_iterations(iterations)
+    velocity_update = functions.gc_velocity_update
+    parameter_update = functions.update_rho
 
     (solution, metrics) = base.optimize(objective_function=objective_function,
                                         domain=Domain(-5.12, 5.12, dimension),
-                                        stopping_condition=
-                                        max_iterations(iterations),
+                                        stopping_condition=stopping_condition,
                                         parameters=parms,
-                                        velocity_update=
-                                        functions.gc_velocity_update,
-                                        parameter_update=
-                                        functions.update_rho,
+                                        velocity_update=velocity_update,
+                                        parameter_update=parameter_update,
                                         measurements=measurements)
 
     assert solution.fitness != np.nan

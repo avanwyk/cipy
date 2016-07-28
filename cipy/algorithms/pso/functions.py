@@ -15,6 +15,7 @@
 """
 
 import numpy as np
+
 from cipy.algorithms.core import comparator
 from cipy.algorithms.pso.types import Particle
 
