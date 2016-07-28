@@ -18,6 +18,10 @@ from cipy.optimizers.pso_optimizer import PSOOptimizer
 
 
 def main():
+    """ Main function for PSO optimizer example.
+
+    Instantiate PSOOptimizer to optimize 30-dimensional spherical function.
+    """
     optimizer = PSOOptimizer()
     solution = optimizer.minimize(sphere, -5.12, 5.12, 30,
                                   max_iterations(1000))
