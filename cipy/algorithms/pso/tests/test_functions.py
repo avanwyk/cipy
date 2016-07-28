@@ -12,19 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Unit tests for the cipy.algorithms.pso module.
+""" Unit tests for the cipy.algorithms.pso.functions module.
 """
 import numpy as np
 import pytest
 
-from cipy.algorithms.core import Domain
 from cipy.algorithms.core import Minimum
-from cipy.algorithms.core import max_iterations
-from cipy.algorithms.core import minimize
-from cipy.algorithms.pso import base
 from cipy.algorithms.pso import functions
 from cipy.algorithms.pso import types
-from cipy.benchmarks import functions as benchmarks
 
 
 @pytest.fixture
@@ -85,22 +80,6 @@ def test_standard_position(rng, dimension):
     actual = functions.std_position(position, velocity)
 
     np.testing.assert_allclose(actual, desired)
-
-
-@pytest.mark.parametrize("swarm_size", [
-    0,
-    1,
-    15,
-    100
-])
-def test_parameter_initialization(swarm_size):
-    params = base.__init_parameters__({"swarm_size": swarm_size})
-
-    assert params["swarm_size"] == swarm_size
-
-    params = base.__init_parameters__({})
-
-    assert params["swarm_size"] is not None
 
 
 def mk_particle(position=None, velocity=None, fitness=None,
