@@ -49,8 +49,8 @@ def std_velocity(particle, social, state):
     c_1, c_2 = state.params['c_1'], state.params['c_2']
     size = particle.position.size
 
-    c_1r_1 = c_1 * state.rng.uniform(0.0, 1.0, size)
-    c_2r_2 = c_2 * state.rng.uniform(0.0, 1.0, size)
+    c_1r_1 = state.rng.uniform(0.0, c_1, size)
+    c_2r_2 = state.rng.uniform(0.0, c_2, size)
 
     return (inertia * particle.velocity +
             c_1r_1 * (particle.best_position - particle.position) +
