@@ -14,12 +14,12 @@
 
 """ Unit tests for the cipy.algorithms.core module.
 """
+import numpy as np
+import pytest
+
 import cipy.algorithms.core as core
 import cipy.algorithms.pso.types as types
 import cipy.benchmarks.functions as functions
-
-import numpy as np
-import pytest
 
 
 def __unit__(x):
@@ -32,10 +32,11 @@ def __unit__(x):
 ])
 @pytest.mark.parametrize("solution", [
     np.array([]),
-    np.array([1,2,3,4,5])
+    np.array([1, 2, 3, 4, 5])
 ])
 def test_minimize(fitness_function, solution):
     minimize = core.minimize(fitness_function)
+
     assert isinstance(minimize(solution), core.Minimum)
 
 
@@ -45,44 +46,41 @@ def test_minimize(fitness_function, solution):
 ])
 @pytest.mark.parametrize("solution", [
     np.array([]),
-    np.array([1,2,3,4,5])
+    np.array([1, 2, 3, 4, 5])
 ])
 def test_maximize(fitness_function, solution):
     maximize = core.maximize(fitness_function)
+
     assert isinstance(maximize(solution), core.Maximum)
 
 
 @pytest.mark.parametrize("iterations", [
-    0,
-    1,
-    10,
-    15
+    0, 1, 10, 15
 ])
 @pytest.mark.parametrize("max_iterations", [
-    0,
-    1,
-    10
+    0, 1, 10
 ])
 def test_maximum_iterations(iterations, max_iterations):
     stopping_condition = core.max_iterations(max_iterations)
 
-    state = types.PSOState(rng=None, params=None, swarm=None, iterations=iterations)
+    state = types.PSOState(rng=None, params=None, swarm=None,
+                           iterations=iterations)
+
     assert stopping_condition(state) == (iterations >= max_iterations)
 
 
 @pytest.mark.parametrize("max_iterations", [
-    0,
-    1,
-    10
+    0, 1, 10
 ])
 def test_dictionary_based_collector(max_iterations):
     measurements = [lambda state: ('fitness', 1.0),
-                    lambda state: ('position', np.array([1,2,3]))]
+                    lambda state: ('position', np.array([1, 2, 3]))]
 
     (results, collect) = core.dictionary_based_measurements(measurements)
     for iteration in range(max_iterations):
         state = core.State(rng=None, params={}, iterations=iteration)
         results = collect(results, state)
+
     assert len(results.keys()) == max_iterations
     for key in results.keys():
         assert len(results[key].keys()) == len(measurements)

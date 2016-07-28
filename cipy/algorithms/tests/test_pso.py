@@ -16,6 +16,7 @@
 """
 import numpy as np
 import pytest
+
 from cipy.algorithms.core import Domain
 from cipy.algorithms.core import Minimum
 from cipy.algorithms.core import max_iterations
@@ -23,9 +24,6 @@ from cipy.algorithms.core import minimize
 from cipy.algorithms.pso import base
 from cipy.algorithms.pso import functions
 from cipy.algorithms.pso import types
-from cipy.algorithms.pso.functions import solution, lbest_topology, \
-    gc_velocity_update, update_rho, gbest_topology
-from cipy.algorithms.pso.functions import fitness_measurement
 from cipy.benchmarks import functions as benchmarks
 
 
@@ -45,7 +43,7 @@ def test_solution(rng, swarm_size):
              for i in range(swarm_size)]
 
     desired = sorted(swarm, key=lambda p: p.best_fitness)[0]
-    actual = solution(swarm)
+    actual = functions.solution(swarm)
 
     assert desired == actual
 
@@ -97,9 +95,11 @@ def test_standard_position(rng, dimension):
 ])
 def test_parameter_initialization(swarm_size):
     params = base.__init_parameters__({"swarm_size": swarm_size})
+
     assert params["swarm_size"] == swarm_size
 
     params = base.__init_parameters__({})
+
     assert params["swarm_size"] is not None
 
 
@@ -113,58 +113,81 @@ def mk_particle(position=None, velocity=None, fitness=None,
     1,
     30
 ])
-def test_gbest_pso(dimension):
+@pytest.mark.parametrize("iterations", [
+    3
+])
+def test_gbest_pso(dimension, iterations):
     """ Smoke test for PSO algorithm testing complete execution of algorithm.
     """
     objective_function = minimize(benchmarks.sphere)
+    parms = {'seed': 3758117674,
+             'topology': functions.gbest_topology}
+    measurements = [functions.fitness_measurement]
+
     (solution, metrics) = base.optimize(objective_function=objective_function,
-                                   domain=Domain(-5.12, 5.12, dimension),
-                                   stopping_condition=max_iterations(3),
-                                   parameters={'seed': 3758117674,
-                                               'topology': gbest_topology},
-                                   measurements=[fitness_measurement])
+                                        domain=Domain(-5.12, 5.12, dimension),
+                                        stopping_condition=
+                                        max_iterations(iterations),
+                                        parameters=parms,
+                                        measurements=measurements)
 
     assert solution.fitness != np.nan
     assert solution.position.size == dimension
+    assert len(metrics.keys()) == iterations
 
 
 @pytest.mark.parametrize("dimension", [
     1,
     30
 ])
-def test_lbest_pso(dimension):
+@pytest.mark.parametrize("iterations", [
+    3
+])
+def test_lbest_pso(dimension, iterations):
     """ Smoke test for PSO algorithm testing complete execution of algorithm.
     """
     objective_function = minimize(benchmarks.sphere)
+    params = {'seed': 3758117674,
+              'topology': functions.lbest_topology, 'n_s': 5}
+    measurements = [functions.fitness_measurement]
+
     (solution, metrics) = base.optimize(objective_function=objective_function,
                                         domain=Domain(-5.12, 5.12, dimension),
-                                        stopping_condition=max_iterations(3),
-                                        parameters={'seed': 3758117674,
-                                                    'topology': lbest_topology,
-                                                    'n_s': 5},
-                                        measurements=[fitness_measurement])
+                                        stopping_condition=
+                                        max_iterations(iterations),
+                                        parameters=params,
+                                        measurements=measurements)
 
     assert solution.fitness != np.nan
     assert solution.position.size == dimension
+    assert len(metrics.keys()) == iterations
 
 
 @pytest.mark.parametrize("dimension", [
     1,
     30
 ])
-def test_gc_pso(dimension):
+@pytest.mark.parametrize("iterations", [
+    3
+])
+def test_gc_pso(dimension, iterations):
     """ Smoke test for PSO algorithm testing complete execution of algorithm.
     """
     objective_function = minimize(benchmarks.sphere)
+    parms = {'seed': 3758117674, 'rho': 1.0, 'e_s': 15, 'e_f': 5}
+    measurements = [functions.fitness_measurement]
+
     (solution, metrics) = base.optimize(objective_function=objective_function,
                                         domain=Domain(-5.12, 5.12, dimension),
-                                        stopping_condition=max_iterations(3),
-                                        parameters={'seed': 3758117674,
-                                                    'rho': 1.0, 'e_s': 15,
-                                                    'e_f': 5},
-                                        velocity_update=gc_velocity_update,
-                                        parameter_update=update_rho,
-                                        measurements=[fitness_measurement])
+                                        stopping_condition=
+                                        max_iterations(iterations),
+                                        parameters=parms,
+                                        velocity_update=
+                                        functions.gc_velocity_update,
+                                        parameter_update=
+                                        functions.update_rho,
+                                        measurements=measurements)
 
     assert solution.fitness != np.nan
     assert solution.position.size == dimension
+    assert len(metrics.keys()) == iterations
