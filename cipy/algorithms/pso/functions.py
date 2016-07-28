@@ -21,47 +21,67 @@ from cipy.algorithms.pso.types import Particle
 
 
 def std_position(position, velocity):
-    """ Standard particle position update.
+    """
+    Standard particle position update according to the equation:
+
+    :math:`x_{ij}(t+1) = x_{ij}(t) + \
+    v_{ij}(t),\\;\\;\\forall\\; j \\in\\; \\{1,...,n\\}`
 
     Args:
-        position: numpy.ndarray: The current position.
-        velocity: numpy.ndarray: The particle velocity.
+        position (numpy.array): The current position.
+        velocity (numpy.array): The particle velocity.
 
     Returns:
-        numpy.ndarray: the calculated position.
+        numpy.array: The calculated position.
     """
     return position + velocity
 
 
 def std_velocity(particle, social, state):
-    """ Standard particle velocity update.
+    """
+    Standard particle velocity update according to the equation:
+
+    :math:`v_{ij}(t+1) &= \\omega v_{ij}(t) + \
+    c_1 r_{1j}(t)[y_{ij}(t) - x_{ij}(t)]\\:+ \
+    c_2 r_{2j}(t)[\\hat{y}_{ij}(t) - x_{ij}(t)],\\;\\;\
+    \\forall\\; j \\in\\; \\{1,...,n\\}`
+
+    If a v_max parameter is supplied (state.params['v_max'] is not None) the
+    returned velocity is clamped to v_max.
 
     Args:
-        particle: cipy.algorithms.pso.Particle: Particle to update the velocity
-            for.
-        social: cipy.algorithms.pso.Particle: The social best for the particle.
-        state: cipy.algorithms.pso.State: The state of the PSO algorithm.
+        particle (cipy.algorithms.pso.types.Particle): Particle to update the
+            velocity for.
+        social (numpy.array): The social best for the
+            particle.
+        state (cipy.algorithms.pso.types.State): The PSO algorithm state.
 
     Returns:
-        numpy.ndarray: the calculated velocity.
+        numpy.array: The calculated velocity, clamped to state.params['v_max'].
     """
     inertia = state.params['inertia']
     c_1, c_2 = state.params['c_1'], state.params['c_2']
+    v_max = state.params['v_max']
     size = particle.position.size
 
-    c_1r_1 = state.rng.uniform(0.0, c_1, size)
-    c_2r_2 = state.rng.uniform(0.0, c_2, size)
+    c1r1 = __acceleration__(state.rng, c_1, size)
+    c2r2 = __acceleration__(state.rng, c_2, size)
 
+    velocity = __std_velocity_equation__(inertia, c1r1, c2r2, particle, social)
+    return __clamp__(velocity, v_max)
+
+
+def __std_velocity_equation__(inertia, c1r1, c2r2, particle, social):
     return (inertia * particle.velocity +
-            c_1r_1 * (particle.best_position - particle.position) +
-            c_2r_2 * (social - particle.position))
+            c1r1 * (particle.best_position - particle.position) +
+            c2r2 * (social - particle.position))
 
 
-def std_velocity_with_v_max(particle, social, state):
-    return clamp(std_velocity(particle, social, state), state.params['v_max'])
+def __acceleration__(rng, coefficient, size):
+    return rng.uniform(0.0, coefficient, size)
 
 
-def clamp(velocity, v_max):
+def __clamp__(velocity, v_max):
     return velocity if v_max is None else np.clip(velocity, -v_max, v_max)
 
 
@@ -79,15 +99,16 @@ def gc_velocity_update(particle, social, state):
     """
     gbest_position = state.swarm[gbest_idx(state.swarm)].position
     if not np.array_equal(gbest_position, particle.position):
-        return std_velocity_with_v_max(particle, social, state)
+        return std_velocity(particle, social, state)
 
     rho = state.params['rho']
     inertia = state.params['inertia']
+    v_max = state.params['v_max']
     size = particle.position.size
 
     r2 = state.rng.uniform(0.0, 1.0, size)
-    return (-1 * particle.position + gbest_position + inertia *
-            particle.velocity + rho * (1 - 2 * r2))
+    return __clamp__(-1 * particle.position + gbest_position + inertia *
+                     particle.velocity + rho * (1 - 2 * r2), v_max)
 
 
 def std_parameter_update(state, objective_function):

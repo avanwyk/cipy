@@ -29,9 +29,7 @@ def rng():
 
 
 @pytest.mark.parametrize("swarm_size", [
-    1,
-    25,
-    100000,
+    1, 25, 100000
 ])
 def test_solution(rng, swarm_size):
     swarm = [mk_particle(best_fitness=Minimum(rng.rand()))
@@ -44,13 +42,10 @@ def test_solution(rng, swarm_size):
 
 
 @pytest.mark.parametrize("swarm_size", [
-    1,
-    25,
-    100,
+    1, 25, 100
 ])
 @pytest.mark.parametrize("dimension", [
-    1,
-    30
+    1, 30
 ])
 def test_gbest(rng, swarm_size, dimension):
     swarm = [mk_particle(best_fitness=Minimum(rng.rand()),
@@ -64,9 +59,7 @@ def test_gbest(rng, swarm_size, dimension):
 
 
 @pytest.mark.parametrize("dimension", [
-    1,
-    30,
-    100000,
+    1, 30, 100000
 ])
 def test_standard_position(rng, dimension):
     position = rng.uniform(-5.12, 5.12, dimension)
@@ -79,7 +72,71 @@ def test_standard_position(rng, dimension):
 
     actual = functions.std_position(position, velocity)
 
-    np.testing.assert_allclose(actual, desired)
+    np.testing.assert_array_equal(actual, desired)
+
+
+@pytest.mark.parametrize("dimension", [
+    1, 30, 10000
+])
+@pytest.mark.parametrize("inertia", [
+    0.0, 0.1, 1.0, 2.0
+])
+@pytest.mark.parametrize("c", [
+    0.0, 0.1, 1.0, 2.0
+])
+def test_standard_velocity_equation(rng, dimension, inertia, c):
+    position = rng.uniform(-5.12, 5.12, dimension)
+    velocity = rng.uniform(-5.12, 5.12, dimension)
+    best_position = rng.uniform(-5.12, 5.12, dimension)
+    particle = mk_particle(position, velocity, None, None, best_position)
+
+    c1r1 = functions.__acceleration__(rng, c, dimension)
+    c2r2 = functions.__acceleration__(rng, c, dimension)
+    social = rng.uniform(-5.12, 5.12, dimension)
+
+    # Naive standard velocity calculation
+    desired = np.zeros(dimension)
+    for i in range(dimension):
+        desired[i] = (inertia * velocity[i] +
+                      c1r1[i] * (best_position[i] - position[i]) +
+                      c2r2[i] * (social[i] - position[i]))
+
+    actual = functions.__std_velocity_equation__(inertia, c1r1, c2r2,
+                                                 particle, social)
+
+    np.testing.assert_array_equal(actual, desired)
+
+
+@pytest.mark.parametrize("coefficient", [
+    0.1, 1.0, 2.0
+])
+@pytest.mark.parametrize("dimension", [
+    1, 30, 100000
+])
+def test_acceleration(rng, coefficient, dimension):
+    acceleration = functions.__acceleration__(rng, coefficient, dimension)
+
+    assert acceleration.size == dimension
+    np.testing.assert_array_less(acceleration, np.full(dimension, coefficient))
+
+
+@pytest.mark.parametrize("dimension", [
+    1, 30, 100000
+])
+@pytest.mark.parametrize("v_max", [
+    0.1, 3.0, None
+])
+def test_clamp(rng, dimension, v_max):
+    velocity = rng.uniform(-5.12, 5.12, dimension)
+
+    clamped = functions.__clamp__(velocity, v_max)
+
+    assert clamped.size == dimension
+    if v_max is not None:
+        assert clamped[np.where(clamped > v_max)].size == 0
+        assert clamped[np.where(clamped < -v_max)].size == 0
+    else:
+        np.testing.assert_array_equal(velocity, clamped)
 
 
 def mk_particle(position=None, velocity=None, fitness=None,

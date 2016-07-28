@@ -19,7 +19,7 @@ import cipy.algorithms.pso as pso
 class PSOOptimizer(object):
     def __init__(self, params=pso.default_parameters(),
                  position_update=pso.std_position,
-                 velocity_update=pso.std_velocity_with_v_max,
+                 velocity_update=pso.std_velocity,
                  parameter_update=pso.std_parameter_update,
                  measurements=(),
                  measurer=core.dictionary_based_metrics):

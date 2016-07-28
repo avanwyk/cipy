@@ -33,7 +33,7 @@ from cipy.algorithms.pso import types
 def optimize(objective_function, domain,
              stopping_condition, parameters=None,
              position_update=functions.std_position,
-             velocity_update=functions.std_velocity_with_v_max,
+             velocity_update=functions.std_velocity,
              parameter_update=functions.std_parameter_update,
              measurements=(),
              measurer=dictionary_based_metrics):

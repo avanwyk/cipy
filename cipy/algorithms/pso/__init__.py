@@ -17,9 +17,9 @@ from .base import optimize
 from .functions import gc_velocity_update
 from .functions import std_parameter_update
 from .functions import std_position
-from .functions import std_velocity_with_v_max
+from .functions import std_velocity
 from .functions import update_rho
 
 __all__ = ['optimize', 'default_parameters', 'std_position',
-           'std_parameter_update', 'std_velocity_with_v_max',
+           'std_parameter_update', 'std_velocity',
            'gc_velocity_update', 'update_rho']
