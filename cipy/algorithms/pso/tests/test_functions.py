@@ -17,6 +17,7 @@
 import numpy as np
 import pytest
 
+from cipy.algorithms.core import Domain
 from cipy.algorithms.core import Minimum
 from cipy.algorithms.pso import functions
 from cipy.algorithms.pso import types
@@ -166,9 +167,28 @@ def test_gc_velocity_equation(rng, dimension, inertia, rho):
     desired = np.zeros(dimension)
     for i in range(dimension):
         desired[i] = (-1 * position[i] + gbest[i] + inertia * velocity[i] +
-                      rho*(1 - 2 * r2[i]))
+                      rho * (1 - 2 * r2[i]))
 
     actual = functions.__gc_velocity_equation__(inertia, rho, r2, particle,
                                                 gbest)
 
     np.testing.assert_array_equal(actual, desired)
+
+
+@pytest.mark.parametrize("dimension", [
+    1, 30, 10000
+])
+def test_particle_initialization(rng, dimension):
+    fitness_function = lambda x: np.sum(x)
+    domain = Domain(-5.12, 5.12, dimension)
+
+    particle = functions.initialize_particle(rng, domain, fitness_function)
+
+    position = particle.position
+    np.testing.assert_array_less(position, np.full(dimension, 5.12))
+    np.testing.assert_array_less(np.full(dimension, -5.12), position)
+
+    assert particle.fitness is not None
+    assert particle.best_fitness is not None
+    assert particle.velocity.size == dimension
+    np.testing.assert_array_equal(particle.best_position, position)

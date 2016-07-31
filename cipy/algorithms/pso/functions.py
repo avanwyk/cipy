@@ -120,7 +120,7 @@ def std_parameter_update(state, objective_function):
     return state
 
 
-def init_particle(rng, domain, fitness_function):
+def initialize_particle(rng, domain, fitness_function):
     """ Initializes a particle within a domain.
     Args:
         rng: numpy.random.RandomState: The random number generator.

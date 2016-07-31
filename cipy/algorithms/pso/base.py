@@ -50,8 +50,8 @@ def optimize(objective_function, domain,
 
     rng = np.random.RandomState(params['seed'])
 
-    initial_swarm = [functions.init_particle(rng, domain,
-                                             objective_function)
+    initial_swarm = [functions.initialize_particle(rng, domain,
+                                                   objective_function)
                      for i in range(params['swarm_size'])]
     state = types.PSOState(rng, params, iterations=0, swarm=initial_swarm)
 
