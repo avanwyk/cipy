@@ -17,7 +17,7 @@
 import numpy as np
 import pytest
 
-from cipy.algorithms.core import Domain
+from cipy.algorithms.core import Domain, minimize
 from cipy.algorithms.core import Minimum
 from cipy.algorithms.pso import functions
 from cipy.algorithms.pso import types
@@ -192,3 +192,35 @@ def test_particle_initialization(rng, dimension):
     assert particle.best_fitness is not None
     assert particle.velocity.size == dimension
     np.testing.assert_array_equal(particle.best_position, position)
+
+
+@pytest.mark.parametrize("dimension", [
+    1, 30
+])
+def test_update_best_fitness(rng, dimension):
+    objective_function = minimize(lambda x: np.sum(x))
+    position = rng.uniform(-5.12, 5.12, dimension)
+    fitness = objective_function(position)
+
+    particle = mk_particle(position, None, 2 * fitness, 2 * fitness, None)
+    updated = functions.update_fitness(objective_function, particle)
+
+    np.testing.assert_array_equal(updated.position, position)
+    np.testing.assert_array_equal(updated.best_position, position)
+    assert updated.fitness == fitness
+    assert updated.best_fitness == fitness
+
+
+@pytest.mark.parametrize("dimension", [
+    1, 30
+])
+def test_update_fitness(rng, dimension):
+    objective_function = minimize(lambda x: np.abs(np.sum(x)))
+    position = rng.uniform(-5.12, 5.12, dimension)
+    fitness = objective_function(position)
+
+    particle = mk_particle(position, None, 2 * fitness, Minimum(0.0), None)
+    updated = functions.update_fitness(objective_function, particle)
+
+    assert updated.fitness == fitness
+    assert updated.best_fitness == Minimum(0.0)
