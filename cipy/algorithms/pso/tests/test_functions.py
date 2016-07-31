@@ -143,3 +143,32 @@ def mk_particle(position=None, velocity=None, fitness=None,
                 best_fitness=None, best_position=None):
     return types.Particle(position, velocity, fitness, best_fitness,
                           best_position)
+
+
+@pytest.mark.parametrize("dimension", [
+    1, 30, 10000
+])
+@pytest.mark.parametrize("inertia", [
+    0.0, 0.1, 1.0, 2.0
+])
+@pytest.mark.parametrize("rho", [
+    0.0, 0.1, 1.0
+])
+def test_gc_velocity_equation(rng, dimension, inertia, rho):
+    position = rng.uniform(-5.12, 5.12, dimension)
+    velocity = rng.uniform(-5.12, 5.12, dimension)
+    gbest = rng.uniform(-5.12, 5.12, dimension)
+    particle = mk_particle(position, velocity, None, None, None)
+
+    r2 = rng.uniform(0.0, 1.0, dimension)
+
+    # Naive GC velocity calculation
+    desired = np.zeros(dimension)
+    for i in range(dimension):
+        desired[i] = (-1 * position[i] + gbest[i] + inertia * velocity[i] +
+                      rho*(1 - 2 * r2[i]))
+
+    actual = functions.__gc_velocity_equation__(inertia, rho, r2, particle,
+                                                gbest)
+
+    np.testing.assert_array_equal(actual, desired)

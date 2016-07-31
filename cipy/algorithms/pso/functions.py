@@ -97,8 +97,8 @@ def gc_velocity_update(particle, social, state):
     Returns:
         numpy.ndarray: the calculated velocity.
     """
-    gbest_position = state.swarm[gbest_idx(state.swarm)].position
-    if not np.array_equal(gbest_position, particle.position):
+    gbest = state.swarm[gbest_idx(state.swarm)].position
+    if not np.array_equal(gbest, particle.position):
         return std_velocity(particle, social, state)
 
     rho = state.params['rho']
@@ -107,8 +107,13 @@ def gc_velocity_update(particle, social, state):
     size = particle.position.size
 
     r2 = state.rng.uniform(0.0, 1.0, size)
-    return __clamp__(-1 * particle.position + gbest_position + inertia *
-                     particle.velocity + rho * (1 - 2 * r2), v_max)
+    velocity = __gc_velocity_equation__(particle, gbest, inertia, rho, r2)
+    return __clamp__(velocity, v_max)
+
+
+def __gc_velocity_equation__(inertia, rho, r2, particle, gbest):
+    return (-1 * particle.position + gbest + inertia *
+            particle.velocity + rho * (1 - 2 * r2))
 
 
 def std_parameter_update(state, objective_function):
