@@ -107,7 +107,7 @@ def gc_velocity_update(particle, social, state):
     size = particle.position.size
 
     r2 = state.rng.uniform(0.0, 1.0, size)
-    velocity = __gc_velocity_equation__(particle, gbest, inertia, rho, r2)
+    velocity = __gc_velocity_equation__(inertia, rho, r2, particle, gbest)
     return __clamp__(velocity, v_max)
 
 
@@ -234,16 +234,21 @@ def lbest_idx(state, idx):
     """
     swarm = state.swarm
     n_s = state.params['n_s']
-    start = idx - (n_s // 2) + 1
-    best = start - 1
-    size = len(swarm)
-    cmp = comparator(swarm[best].best_fitness)
-    for k in range(n_s):
-        idx = (start + k) % size
-        particle = swarm[idx]
-        if cmp(particle.best_fitness, swarm[best].best_fitness):
-            best = idx
+    cmp = comparator(swarm[0].best_fitness)
+    indices = __lbest_indices__(len(swarm), n_s, idx)
+    best = None
+    for i in indices:
+        if best is None or cmp(swarm[i].best_fitness, swarm[best].best_fitness):
+            best = i
     return best
+
+
+def __lbest_indices__(size, n_s, idx):
+    start = idx - (n_s // 2)
+    idxs = []
+    for k in range(n_s):
+        idxs.append((start + k) % size)
+    return idxs
 
 
 def update_rho(state, objective_function):

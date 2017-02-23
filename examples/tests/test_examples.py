@@ -67,5 +67,5 @@ def test_gc_pso(dimension, iterations):
     3
 ])
 @example
-def test_gc_pso(dimension, iterations):
+def test_optimizer(dimension, iterations):
     pso_optimizer(dimension, iterations)

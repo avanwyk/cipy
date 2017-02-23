@@ -13,12 +13,19 @@
 # limitations under the License.
 from examples import bench
 from examples.gbest_pso import main as gbest
+from examples.lbest_pso import main as lbest
 from examples.pso_optimizer import main as pso_optimizer
 
 
 @bench
 def test_gbest_benchmark(benchmark):
     result = benchmark(gbest, 30, 1000)
+    assert result is not None
+
+
+@bench
+def test_lbest_benchmark(benchmark):
+    result = benchmark(lbest, 30, 1000)
     assert result is not None
 
 

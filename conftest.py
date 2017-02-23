@@ -3,3 +3,5 @@ def pytest_addoption(parser):
                      help="run examples")
     parser.addoption("--runbenchmarks", action="store_true",
                      help="run benchmarks")
+    parser.addoption("--all", action="store_true",
+                     help="run benchmarks")

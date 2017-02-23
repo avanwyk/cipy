@@ -14,11 +14,11 @@
 import pytest
 
 example = pytest.mark.skipif(
-    not pytest.config.getoption("--runexamples"),
+    not pytest.config.getoption("--runexamples") and not pytest.config.getoption("--all"),
     reason="need --runexamples option to run"
 )
 
 bench = pytest.mark.skipif(
-    not pytest.config.getoption("--runbenchmarks"),
+    not pytest.config.getoption("--runbenchmarks") and not pytest.config.getoption("--all"),
     reason="need --runbenchmarks option to run"
 )

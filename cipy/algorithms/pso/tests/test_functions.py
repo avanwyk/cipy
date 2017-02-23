@@ -224,3 +224,20 @@ def test_update_fitness(rng, dimension):
 
     assert updated.fitness == fitness
     assert updated.best_fitness == Minimum(0.0)
+
+
+@pytest.mark.parametrize("size", [
+    10, 30, 100
+])
+@pytest.mark.parametrize("n_s", [
+    1, 2, 5, 10
+])
+@pytest.mark.parametrize("idx", [
+    0, -1, 9, 5
+])
+def test_lbest_indices(size, n_s, idx):
+    idx = idx if idx >= 0 else idx + size
+    indices = functions.__lbest_indices__(size, n_s, idx)
+    assert len(indices) == n_s
+    assert idx in indices
+    assert len(indices) == len(set(indices))
