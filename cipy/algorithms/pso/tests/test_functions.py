@@ -17,7 +17,6 @@
 import numpy as np
 import pytest
 
-from cipy import unit_test
 from cipy.algorithms.core import Domain, minimize
 from cipy.algorithms.core import Minimum
 from cipy.algorithms.pso import functions
@@ -33,7 +32,6 @@ def rng():
 @pytest.mark.parametrize("swarm_size", [
     1, 25, 100000
 ])
-@unit_test
 def test_solution(rng, swarm_size):
     swarm = [mk_particle(best_fitness=Minimum(rng.rand()))
              for i in range(swarm_size)]
@@ -50,7 +48,6 @@ def test_solution(rng, swarm_size):
 @pytest.mark.parametrize("dimension", [
     1, 30
 ])
-@unit_test
 def test_gbest(rng, swarm_size, dimension):
     swarm = [mk_particle(best_fitness=Minimum(rng.rand()),
                          best_position=rng.uniform(-5.12, 5.12, dimension))
@@ -65,7 +62,6 @@ def test_gbest(rng, swarm_size, dimension):
 @pytest.mark.parametrize("dimension", [
     1, 30, 100000
 ])
-@unit_test
 def test_standard_position(rng, dimension):
     position = rng.uniform(-5.12, 5.12, dimension)
     velocity = rng.uniform(-1.0, 1.0, dimension)
@@ -89,7 +85,6 @@ def test_standard_position(rng, dimension):
 @pytest.mark.parametrize("c", [
     0.0, 0.1, 1.0, 2.0
 ])
-@unit_test
 def test_standard_velocity_equation(rng, dimension, inertia, c):
     position = rng.uniform(-5.12, 5.12, dimension)
     velocity = rng.uniform(-5.12, 5.12, dimension)
@@ -119,7 +114,6 @@ def test_standard_velocity_equation(rng, dimension, inertia, c):
 @pytest.mark.parametrize("dimension", [
     1, 30, 100000
 ])
-@unit_test
 def test_acceleration(rng, coefficient, dimension):
     acceleration = functions.__acceleration__(rng, coefficient, dimension)
 
@@ -133,7 +127,6 @@ def test_acceleration(rng, coefficient, dimension):
 @pytest.mark.parametrize("v_max", [
     0.1, 3.0, None
 ])
-@unit_test
 def test_clamp(rng, dimension, v_max):
     velocity = rng.uniform(-5.12, 5.12, dimension)
 
@@ -162,7 +155,6 @@ def mk_particle(position=None, velocity=None, fitness=None,
 @pytest.mark.parametrize("rho", [
     0.0, 0.1, 1.0
 ])
-@unit_test
 def test_gc_velocity_equation(rng, dimension, inertia, rho):
     position = rng.uniform(-5.12, 5.12, dimension)
     velocity = rng.uniform(-5.12, 5.12, dimension)
@@ -186,7 +178,6 @@ def test_gc_velocity_equation(rng, dimension, inertia, rho):
 @pytest.mark.parametrize("dimension", [
     1, 30, 10000
 ])
-@unit_test
 def test_particle_initialization(rng, dimension):
     fitness_function = lambda x: np.sum(x)
     domain = Domain(-5.12, 5.12, dimension)
@@ -206,7 +197,6 @@ def test_particle_initialization(rng, dimension):
 @pytest.mark.parametrize("dimension", [
     1, 30
 ])
-@unit_test
 def test_update_best_fitness(rng, dimension):
     objective_function = minimize(lambda x: np.sum(x))
     position = rng.uniform(-5.12, 5.12, dimension)
@@ -224,7 +214,6 @@ def test_update_best_fitness(rng, dimension):
 @pytest.mark.parametrize("dimension", [
     1, 30
 ])
-@unit_test
 def test_update_fitness(rng, dimension):
     objective_function = minimize(lambda x: np.abs(np.sum(x)))
     position = rng.uniform(-5.12, 5.12, dimension)

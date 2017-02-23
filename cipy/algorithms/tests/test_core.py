@@ -20,7 +20,6 @@ import pytest
 import cipy.algorithms.core as core
 import cipy.algorithms.pso.types as types
 import cipy.benchmarks.functions as functions
-from cipy import unit_test
 
 
 def __unit__(x):
@@ -35,7 +34,6 @@ def __unit__(x):
     np.array([]),
     np.array([1, 2, 3, 4, 5])
 ])
-@unit_test
 def test_minimize(fitness_function, solution):
     minimize = core.minimize(fitness_function)
 
@@ -50,7 +48,6 @@ def test_minimize(fitness_function, solution):
     np.array([]),
     np.array([1, 2, 3, 4, 5])
 ])
-@unit_test
 def test_maximize(fitness_function, solution):
     maximize = core.maximize(fitness_function)
 
@@ -63,7 +60,6 @@ def test_maximize(fitness_function, solution):
 @pytest.mark.parametrize("max_iterations", [
     0, 1, 10
 ])
-@unit_test
 def test_maximum_iterations(iterations, max_iterations):
     stopping_condition = core.max_iterations(max_iterations)
 
@@ -76,7 +72,6 @@ def test_maximum_iterations(iterations, max_iterations):
 @pytest.mark.parametrize("max_iterations", [
     0, 1, 10
 ])
-@unit_test
 def test_dictionary_based_collector(max_iterations):
     measurements = [lambda state: ('fitness', 1.0),
                     lambda state: ('position', np.array([1, 2, 3]))]

@@ -11,6 +11,17 @@ code is a priority, exhaustive testing of the code is an ongoing
 endeavor.
 
 ### Installation
+
+* Source (Anaconda environment) **recommended**
+
+    ```shell
+    git clone https://github.com/avanwyk/cipy
+    cd cipy
+    conda env create -f environment.yml
+    source activate cipy-env
+    pip install -e .
+    ```
+
 * Source (development)
 
     ```shell
@@ -18,6 +29,7 @@ endeavor.
     cd cipy
     pip install -e .
     ```
+    
 * Source (setup.py)
 
     ```shell
@@ -25,6 +37,7 @@ endeavor.
     cd cipy
     python setup.py install
     ```
+    
 * PyPI
 
     ```shell
@@ -39,16 +52,28 @@ python examples/gbest_pso.py
 ```
 
 ### Tests
-Tests may be run with pytest:
+Unit tests may be run with pytest:
 
 ```shell
 python -m pytest
 ```
 
-or via setup.py
+or setup.py:
 
 ```shell
 python setup.py test
+```
+
+Examples and project benchmarks may be run with pytest as follows:
+
+```shell
+python -m pytest --runexamples
+```
+
+and
+
+```shell
+python -m pytest --runbenchmarks
 ```
 
 ### License

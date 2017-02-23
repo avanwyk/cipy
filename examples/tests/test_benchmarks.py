@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from cipy import bench
+from examples import bench
 from examples.gbest_pso import main as gbest
 from examples.pso_optimizer import main as pso_optimizer
 

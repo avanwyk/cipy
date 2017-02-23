@@ -14,22 +14,6 @@
 
 """ A collection of Computational Intelligence algorithms.
 """
-import pytest
 __author__ = "avanwyk"
 __version__ = "0.1"
 __revision__ = "0.1.0.dev1"
-
-unit_test = pytest.mark.skipif(
-    pytest.config.getoption("--runexamples") or pytest.config.getoption("--runbenchmarks"),
-    reason="not execute with examples or benchmarks"
-)
-
-example = pytest.mark.skipif(
-    not pytest.config.getoption("--runexamples"),
-    reason="need --runexamples option to run"
-)
-
-bench = pytest.mark.skipif(
-    not pytest.config.getoption("--runbenchmarks"),
-    reason="need --runbenchmarks option to run"
-)

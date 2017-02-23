@@ -16,7 +16,7 @@
 """
 import pytest
 
-from cipy import example
+from examples import example
 from examples.gbest_pso import main as gbest
 from examples.gc_pso import main as gc
 from examples.lbest_pso import main as lbest

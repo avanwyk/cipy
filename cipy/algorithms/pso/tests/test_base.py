@@ -16,14 +16,12 @@
 """
 import pytest
 
-from cipy import unit_test
 from cipy.algorithms.pso import base
 
 
 @pytest.mark.parametrize("swarm_size", [
     0, 1, 15, 100
 ])
-@unit_test
 def test_parameter_initialization(swarm_size):
     params = base.__init_parameters__({"swarm_size": swarm_size})
 
