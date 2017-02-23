@@ -11,24 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-""" Unit tests for the cipy.algorithms.pso.base module.
-"""
-import pytest
-
-from cipy import unit_test
-from cipy.algorithms.pso import base
+from cipy import bench
+from examples.gbest_pso import main as gbest
+from examples.pso_optimizer import main as pso_optimizer
 
 
-@pytest.mark.parametrize("swarm_size", [
-    0, 1, 15, 100
-])
-@unit_test
-def test_parameter_initialization(swarm_size):
-    params = base.__init_parameters__({"swarm_size": swarm_size})
+@bench
+def test_gbest_benchmark(benchmark):
+    result = benchmark(gbest, 30, 1000)
+    assert result is not None
 
-    assert params["swarm_size"] == swarm_size
 
-    params = base.__init_parameters__({})
-
-    assert params["swarm_size"] is not None
+@bench
+def test_pso_benchmark(benchmark):
+    result = benchmark(pso_optimizer, 30, 1000)
+    assert result is not None

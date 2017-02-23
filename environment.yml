@@ -6,3 +6,4 @@ dependencies:
     - pylint==1.5.4
     - pytest==2.9.2
     - pytest-runner==2.8
+    - pytest-benchmark==3.0.0

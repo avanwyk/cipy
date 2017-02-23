@@ -16,6 +16,7 @@
 """
 import pytest
 
+from cipy import example
 from examples.gbest_pso import main as gbest
 from examples.gc_pso import main as gc
 from examples.lbest_pso import main as lbest
@@ -29,6 +30,7 @@ from examples.pso_optimizer import main as pso_optimizer
 @pytest.mark.parametrize("iterations", [
     3
 ])
+@example
 def test_gbest_pso(dimension, iterations):
     gbest(dimension, iterations)
 
@@ -40,6 +42,7 @@ def test_gbest_pso(dimension, iterations):
 @pytest.mark.parametrize("iterations", [
     3
 ])
+@example
 def test_lbest_pso(dimension, iterations):
     lbest(dimension, iterations)
 
@@ -51,6 +54,7 @@ def test_lbest_pso(dimension, iterations):
 @pytest.mark.parametrize("iterations", [
     3
 ])
+@example
 def test_gc_pso(dimension, iterations):
     gc(dimension, iterations)
 
@@ -62,5 +66,6 @@ def test_gc_pso(dimension, iterations):
 @pytest.mark.parametrize("iterations", [
     3
 ])
+@example
 def test_gc_pso(dimension, iterations):
     pso_optimizer(dimension, iterations)
