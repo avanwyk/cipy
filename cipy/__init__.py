@@ -16,4 +16,4 @@
 """
 __author__ = "avanwyk"
 __version__ = "0.1"
-__revision__ = "0.1.0.dev1"
+__revision__ = "0.1.0"

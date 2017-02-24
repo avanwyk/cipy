@@ -12,7 +12,7 @@ endeavor.
 
 ### Installation
 
-* Source (Anaconda environment) **recommended**
+* Source (Anaconda environment): **recommended for development**
 
     ```shell
     git clone https://github.com/avanwyk/cipy
@@ -38,7 +38,7 @@ endeavor.
     python setup.py install
     ```
     
-* PyPI
+* PyPI: **recommended for use.**
 
     ```shell
     pip install cipy
@@ -75,6 +75,9 @@ and
 ```shell
 python -m pytest --runbenchmarks
 ```
+
+### Issues
+This project uses the [Github issue tracker](https://github.com/avanwyk/cipy/issues). Please report any issues there.
 
 ### License
 The project uses
