@@ -12,7 +12,7 @@ endeavor.
 
 ### Installation
 
-* Source (Anaconda environment): **recommended for development**
+* Source (Anaconda environment): **recommended for development.**
 
     ```shell
     git clone https://github.com/avanwyk/cipy
