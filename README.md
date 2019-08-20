@@ -37,12 +37,6 @@ endeavor.
     cd cipy
     python setup.py install
     ```
-    
-* PyPI: **recommended for use.**
-
-    ```shell
-    pip install cipy
-    ``` 
 
 ### Examples
 Examples of algorithms are given in the examples/ directory:
